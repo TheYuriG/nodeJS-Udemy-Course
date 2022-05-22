@@ -1,8 +1,20 @@
-const http = require("http");
-const routes = require("./routes.js");
+const express = require("express");
 
-//? Create server
-const server = http.createServer(routes.handler);
+//? Pull express as a function that can handle routing
+const app = express();
 
-//? Listen to the server, so it's always online and you can respond to network requests
-server.listen(3000);
+//? This is the first middleware, all your requests will go here before anywhere else
+app.use((req, res, next) => {
+  console.log("in the middleware");
+  next(); //? This allows the request to continue to the next middleware in line
+});
+
+//? This is the second middleware, the code will only run here if the previous
+//? middleware had called for 'next()'
+app.use((req, res, next) => {
+  console.log("in another middleware");
+  res.send("<h1>Hello from Express!</h1>");
+});
+
+//? Starts the server and listen to a specific port
+app.listen(3000);
