@@ -53,4 +53,4 @@ const requestHandler = (req, res) => {
   res.end();
 };
 
-exports = { handler: requestHandler, text: "Irrelevant text" };
+module.exports = { handler: requestHandler, text: "Irrelevant text" };
