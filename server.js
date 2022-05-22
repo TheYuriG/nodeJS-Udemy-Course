@@ -1,20 +1,29 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 
 //? Pull express as a function that can handle routing
 const app = express();
 
-//? This is the first middleware, all your requests will go here before anywhere else
-app.use((req, res, next) => {
-  console.log("in the middleware");
-  next(); //? This allows the request to continue to the next middleware in line
-});
+//? Uses the 'body-parser' package to parse text response bodies
+app.use(bodyParser.urlencoded({ extended: false }));
 
-//? This is the second middleware, the code will only run here if the previous
-//? middleware had called for 'next()'
+//? Read from the folder and file to setup specific routes to be done
+const adminRoutes = require("./routes/admin.js");
+const shopRoutes = require("./routes/shop.js");
+
+//? Routes to the admin routes, if that's what you can/want to access
+app.use("/admin", adminRoutes);
+
+//? Routes to the shop if the user can't access admin
+app.use(shopRoutes);
+
+//? Default catcher for 'Page Not Found' errors
 app.use((req, res, next) => {
-  console.log("in another middleware");
-  res.send("<h1>Hello from Express!</h1>");
+  res.status(404).send("<h1>Page not found!</h1>");
 });
 
 //? Starts the server and listen to a specific port
-app.listen(3000);
+const port = 3000;
+app.listen(port, () => {
+  console.log("listening on port " + port);
+});
