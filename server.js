@@ -1,3 +1,7 @@
+//? Core dependencies
+const path = require("path");
+
+//? NPM dependencies
 const express = require("express");
 const bodyParser = require("body-parser");
 
@@ -5,7 +9,12 @@ const bodyParser = require("body-parser");
 const app = express();
 
 //? Uses the 'body-parser' package to parse text response bodies
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//? Setups up a static serve for files under public, so that
+//? browsers can access CSS files and anything else under this folder.
+//? You should omit "/public" on path, as this will make the routes look into public by default
+app.use(express.static(path.join(__dirname, "public")));
 
 //? Read from the folder and file to setup specific routes to be done
 const adminRoutes = require("./routes/admin.js");
@@ -18,8 +27,8 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 //? Default catcher for 'Page Not Found' errors
-app.use((req, res, next) => {
-  res.status(404).send("<h1>Page not found!</h1>");
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "page-not-found.html"));
 });
 
 //? Starts the server and listen to a specific port
