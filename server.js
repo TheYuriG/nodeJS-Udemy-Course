@@ -22,7 +22,7 @@ const adminRoutes = require("./routes/admin.js");
 const shopRoutes = require("./routes/shop.js");
 
 //? Routes to the admin routes, if that's what you can/want to access
-app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes.routes);
 
 //? Routes to the shop if the user can't access admin
 app.use(shopRoutes);
