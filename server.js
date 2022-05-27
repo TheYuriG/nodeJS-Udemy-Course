@@ -13,7 +13,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //? Setups up a static serve for files under public, so that
 //? browsers can access CSS files and anything else under this folder.
-//? You should omit "/public" on path, as this will make the routes look into public by default
+//? You should omit "/public" on path for files in the html code
+//? trying to access these files, as they will load that folder by default
 app.use(express.static(path.join(__dirname, "public")));
 
 //? Read from the folder and file to setup specific routes to be done
