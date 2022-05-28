@@ -1,7 +1,11 @@
+//- This pulls the template to then add content on top of it
 extends layouts/regenerative-page.pug
 
+//- the block keyword is used here as a variable that defines that will be injected
+//- inside the same block keyword within the template being pulled above
 block content 
     div.grid
+        //- the if statement below will only render those things when true
         if leProdo.length > 0
             each product in leProdo
                 article.card.product-item 
@@ -14,5 +18,6 @@ block content
                         p.product__description A very interesting book about trees and leaves 
                     div.card__actions 
                         button.btn Add to cart
+        //- otherwise this else statement will run instead and give the error message
         else
             h1 Bruh, just add some books

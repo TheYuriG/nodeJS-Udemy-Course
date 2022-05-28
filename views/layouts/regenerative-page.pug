@@ -1,19 +1,28 @@
+//- This page will be rendered inside every other page
 doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    //- pageTitle needs to be sent into every res.render() as the second parameter
+    //- which is an object. eg: res.render('myPage', {pagetitle: "whatever name"})
     title #{pageTitle}
+    //- this is the default css file used in all pages
     link(rel="stylesheet", href="/css/main.css")
 
-  body  
+  body
+    //- every page will have this same header
     header.main-header
       nav.main-header__nav
         ul.main-header__item-list
+          //- the header will have specific logic to color the text based on
+          //- whatever page you are currently visiting, using tertiary operators
           li.main-header__item
             a(href="/", class=(path==="Home" ? "active" : "inactive")) Shop
           li.main-header__item
             a(href="/admin/add-product", class=(path==="New" ? "active" : "inactive")) Add Product
     main
+      //- the block keyword will give space for whatever files are
+      //- using this template to inject their own files/code
       block content
