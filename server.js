@@ -37,7 +37,7 @@ app.use(shopRoutes);
 //? Default catcher for 'Page Not Found' errors, pulls the html code from
 //? the views folder, like for every other html code
 app.use((req, res) => {
-  res.status(404).render("page-not-found");
+  res.status(404).render("page-not-found", { path: "Error! You got nowhere!" });
 });
 
 //? Starts the server and listen to a specific port

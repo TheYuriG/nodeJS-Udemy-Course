@@ -8,7 +8,9 @@ const products = [];
 router.get("/add-product", (req, res) => {
   //? render the html page based on the pug engine we defined on the server.js
   //? and get-product.pug file that we added to the views folder
-  res.render("get-product");
+  res.render("get-product", { pageTitle: "Add new books to the shop", path: "New" });
+  //? Sends the path variable as anything i want in order to render the CSS for
+  //? the header properly, highlighting the proper link in
 });
 
 //? /admin/add-product → POST

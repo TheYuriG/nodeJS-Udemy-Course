@@ -1,23 +1,8 @@
-doctype html
-html(lang="en")
-  head
-    meta(charset="UTF-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Admin Area
-    link(rel="stylesheet", href="/css/main.css")
-  body 
-    header.main-header
-      nav.main-header__nav
-        ul.main-header__item-list
-          li.main-header__item
-            a.inactive(href="/") Shop
-          li.main-header__item
-            a.active(href="/admin/add-product") Add Product
-  
-    main
-      form.product-form(action="/admin/add-product" method="POST")
-        div.form-control
-          label(for="title") Title
-          input(type="text" name="title")#title
-        button(type="submit") Add Product
+extends layouts/regenerative-page.pug
+
+block content 
+  form.product-form(action="/admin/add-product" method="POST")
+    div.form-control
+      label(for="title") New book name?
+      input(type="text" name="title")#title
+    button(type="submit") Add Product

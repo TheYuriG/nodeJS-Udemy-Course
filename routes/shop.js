@@ -15,9 +15,10 @@ router.get("/", (req, res) => {
   const laProducione = adminData.prod;
   //? render the html page based on the pug engine we defined on the server.js
   //? and shops.pug file that we added to the views folder
-  res.render("shops", { leProdo: laProducione, pageTitle: "Main Shop Screen" });
+  res.render("shops", { leProdo: laProducione, pageTitle: "Main Shop Screen", path: "Home" });
   //? we also pass whatever we want to be rendered in the pug file as
-  //? additional arguments.
+  //? additional arguments, including the path variable in order to render
+  //? the CSS for the header properly, highlighting the proper link in
 });
 
 module.exports = router;
