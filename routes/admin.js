@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 
 const router = express.Router();
 
@@ -7,7 +6,9 @@ const products = [];
 
 //? /admin/add-product → GET
 router.get("/add-product", (req, res) => {
-  res.sendFile(path.join(__dirname, "../", "views", "get-product.html"));
+  //? render the html page based on the pug engine we defined on the server.js
+  //? and get-product.pug file that we added to the views folder
+  res.render("get-product");
 });
 
 //? /admin/add-product → POST

@@ -11,8 +11,13 @@ const adminData = require("./admin.js");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  console.log(adminData.prod);
-  res.sendFile(path.join(__dirname, "../", "views", "shops.html"));
+  //? loading the array with whatever was written in the box at get-product.html
+  const laProducione = adminData.prod;
+  //? render the html page based on the pug engine we defined on the server.js
+  //? and shops.pug file that we added to the views folder
+  res.render("shops", { leProdo: laProducione, pageTitle: "Main Shop Screen" });
+  //? we also pass whatever we want to be rendered in the pug file as
+  //? additional arguments.
 });
 
 module.exports = router;

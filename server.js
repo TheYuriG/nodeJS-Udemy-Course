@@ -4,9 +4,16 @@ const path = require("path");
 //? NPM dependencies
 const express = require("express");
 const bodyParser = require("body-parser");
+// const pug =
 
 //? Pull express as a function that can handle routing
 const app = express();
+
+//? sets up pug as main html renderer, look up express().set() documentation if needed
+app.set("view engine", "pug");
+//? sets up the location of the html files. by default, uses the views folder,
+//? but we are explicitly declaring it here for possible future reference
+app.set("views", "views");
 
 //? Uses the 'body-parser' package to parse text response bodies
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,7 +34,8 @@ app.use("/admin", adminRoutes.routes);
 //? Routes to the shop if the user can't access admin
 app.use(shopRoutes);
 
-//? Default catcher for 'Page Not Found' errors
+//? Default catcher for 'Page Not Found' errors, pulls the html code from
+//? the views folder, like for every other html code
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "views", "page-not-found.html"));
 });
