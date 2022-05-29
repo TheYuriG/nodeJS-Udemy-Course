@@ -1,87 +1,101 @@
+body {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+}
 
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: sans-serif;
-      }
+main {
+	padding: 3rem;
+}
 
-      main {
-        padding: 3rem;
-      }
+.main-header {
+	width: 100%;
+	height: 3.5rem;
+	background-color: green;
+	padding: 0 1.5rem;
+}
 
-      .main-header {
-        width: 100%;
-        height: 3.5rem;
-        background-color: green;
-        padding: 0 1.5rem;
-      }
+.not-found {
+	margin: 20px;
+}
 
-      .main-header__item-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-      }
+.main-header__item-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+}
 
-      .main-header__nav {
-        height: 100%;
-        display: flex;
-        align-items: center;
-      }
+.main-header__nav {
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
 
-      .main-header__item {
-        margin: 0 1rem;
-        padding: 0;
-      }
+.main-header__item {
+	margin: 0 1rem;
+	padding: 0;
+}
 
-      .main-header-item a {
-        text-decoration: none;
-        color: white;
-      }
+.main-header-item a {
+	text-decoration: none;
+	color: white;
+}
 
-      .main-header__item a:hover,
-      .main-header__item a:active,
-      .main-header__item a.active {
-        color: yellow;
-      }
-      
-      .main-header__item a.inactive {
-        color: white;
-      }
+.main-header__item a:hover,
+.main-header__item a:active,
+.main-header__item a.active {
+	color: yellow;
+}
 
-      .product-form {
-        width: 30rem;
-        max-width: 90%;
-        margin: auto;
-      }
+.main-header__item a.inactive {
+	color: white;
+}
 
-      .form-control {
-        margin: 1rem 0;
-      }
+.product-form {
+	width: 30rem;
+	max-width: 90%;
+	margin: auto;
+}
 
-      .form-control label,
-      .form-control input {
-        display: block;
-        width: 100%;
-      }
+.grid {
+	position: centered;
+	margin-left: auto;
+	margin-right: auto;
+}
 
-      .form-control input {
-        border: 3px solid #9b0000;
-        font: inherit;
-        border-radius: 5px;
-      }
+.product__image {
+	max-width: 100%;
+	height: auto;
+}
 
-      button {
-        font: inherit;
-        border: 3px solid #9b0000;
-        color: #9b0000;
-        background: white;
-        border-radius: 5px;
-        cursor: pointer;
-      }
+.form-control {
+	margin: 1rem 0;
+}
 
-      button:hover,
-      button:active {
-        background-color: purple;
-        color: white;
-      }
+.form-control label,
+.form-control input {
+	display: block;
+	width: 100%;
+}
+
+.form-control input {
+	border: 3px solid #9b0000;
+	font: inherit;
+	border-radius: 5px;
+}
+
+button {
+	font: inherit;
+	border: 3px solid #9b0000;
+	color: #9b0000;
+	background: white;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+button:hover,
+button:active {
+	background-color: purple;
+	color: white;
+}
