@@ -1,8 +1,0 @@
-extends layouts/regenerative-page.pug
-
-block content 
-  form.product-form(action="/admin/add-product" method="POST")
-    div.form-control
-      label(for="title") New book name?
-      input(type="text" name="title")#title
-    button(type="submit") Add Product
