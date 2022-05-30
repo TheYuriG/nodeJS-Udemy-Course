@@ -1,31 +1,17 @@
+//? Require the NPM module express
 const express = require('express');
 
+//? Require the controller file so the middleware below knows what to do on each file
+const adminController = require('../controllers/product-controller.js');
+
+//? Setup the routing for the required HTML files
 const router = express.Router();
 
-const products = [];
-
 //? /admin/add-product → GET
-router.get('/add-product', (req, res) => {
-	//? render the html page based on the pug engine we defined on the server.js
-	//? and get-product.pug file that we added to the views folder
-	// res.render("get-product", { pageTitle: "Add new books to the shop", path: "New" });
-	//? Sends the path variable as anything i want in order to render the CSS for
-	//? the header properly, highlighting the proper link in
-
-	//? same render, but for handlebars
-	res.render('get-product', { pageTitle: 'Add new books to the shop' });
-});
+router.get('/add-product', adminController.getProduct);
 
 //? /admin/add-product → POST
-router.post('/add-product', (req, res) => {
-	res.redirect('/');
-	//? This pushes whatever items you added on the page to the array which is later
-	//? served in HTML. The request is processed on the form HTML tag in the
-	//? get-products.html page and then later served in shops.html page
-	products.push({ title: req.body.title });
-});
+router.post('/add-product', adminController.postProduct);
 
-//? Exporting multiple things at once, so they need to
-//? be accessed as properties of this file, regardless of how the file
-//? is defined when summoned
-module.exports = { routes: router, prod: products };
+//? Exporting the router to be accessed in other functions
+module.exports = router;

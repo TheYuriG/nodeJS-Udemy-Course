@@ -5,11 +5,13 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+//? modules import
+const errorController = require('./controllers/error.js');
+
 //? Pull express as a function that can handle routing
 const app = express();
 
-//? setting up handlebars as the template engine because this tutorial says we
-//? should but i really don't want to
+//? using EJS as view engine, just because the tutorial uses it, despite pug being better
 app.set('view engine', 'ejs');
 // sets up pug as main html renderer, look up express().set() documentation if needed
 // app.set("view engine", "pug");
@@ -31,16 +33,14 @@ const adminRoutes = require('./routes/admin.js');
 const shopRoutes = require('./routes/shop.js');
 
 //? Routes to the admin routes, if that's what you can/want to access
-app.use('/admin', adminRoutes.routes);
+app.use('/admin', adminRoutes);
 
 //? Routes to the shop if the user can't access admin
 app.use(shopRoutes);
 
 //? Default catcher for 'Page Not Found' errors, pulls the html code from
 //? the views folder, like for every other html code
-app.use((req, res) => {
-	res.status(404).render('page-not-found', { pageTitle: 'Error! You got nowhere!' });
-});
+app.use(errorController);
 
 //? Starts the server and listen to a specific port
 const port = 3000;
