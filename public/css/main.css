@@ -5,7 +5,7 @@ body {
 }
 
 main {
-	padding: 3rem;
+	padding: 0 1.5rem;
 }
 
 .main-header {
@@ -13,10 +13,6 @@ main {
 	height: 3.5rem;
 	background-color: green;
 	padding: 0 1.5rem;
-}
-
-.not-found {
-	margin: 20px;
 }
 
 .main-header__item-list {
