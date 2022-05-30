@@ -28,8 +28,6 @@ router.get('/', (req, res) => {
 	res.render('shops', {
 		leProdo: laProducione,
 		pageTitle: 'Main Shop Screen',
-		hasProdos: laProducione.length > 0,
-		userIsInShopPage: true,
 	});
 });
 

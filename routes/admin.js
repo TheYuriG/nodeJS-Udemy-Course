@@ -13,7 +13,7 @@ router.get('/add-product', (req, res) => {
 	//? the header properly, highlighting the proper link in
 
 	//? same render, but for handlebars
-	res.render('get-product', { pageTitle: 'Add new books to the shop', userIsInAdmin: true });
+	res.render('get-product', { pageTitle: 'Add new books to the shop' });
 });
 
 //? /admin/add-product → POST

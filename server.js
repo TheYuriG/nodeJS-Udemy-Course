@@ -4,24 +4,13 @@ const path = require('path');
 //? NPM dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
-//? This is also a NPM dependency, but just an alternate template engine
-//! express-handlebars needs to be installed as 3.0 because it becomes
-//! a massive headache otherwise with the several breaking changes it had since
-const barsBeingHandled = require('express-handlebars');
 
 //? Pull express as a function that can handle routing
 const app = express();
 
-//? Add another template engine to be used over pug. The pug engine code below is
-//? commented out so handlebars can be used, but from my usage and the readability
-//? of pug files, they are just superior and should be used instead
-app.engine('handlebars', barsBeingHandled({ layoursDir: 'views/layouts/', defaultLayout: 'regenerative-layout' }));
-//? handlebars requires you to explicitly define layout templates and optionally
-//? the main layout. class doesn't touch on how you can use main layouts programatically
-
 //? setting up handlebars as the template engine because this tutorial says we
 //? should but i really don't want to
-app.set('view engine', 'handlebars');
+app.set('view engine', 'ejs');
 // sets up pug as main html renderer, look up express().set() documentation if needed
 // app.set("view engine", "pug");
 //? sets up the location of the html files. by default, uses the views folder,
@@ -50,7 +39,7 @@ app.use(shopRoutes);
 //? Default catcher for 'Page Not Found' errors, pulls the html code from
 //? the views folder, like for every other html code
 app.use((req, res) => {
-	res.status(404).render('page-not-found', { path: 'Error! You got nowhere!' });
+	res.status(404).render('page-not-found', { pageTitle: 'Error! You got nowhere!' });
 });
 
 //? Starts the server and listen to a specific port
