@@ -1,11 +1,13 @@
 //? Pulling the product-controller file so the products can be served in this page
-const productsData = require('./product-controller.js').products;
+const Product = require('../models/items.js');
 
 exports.getShop = (req, res) => {
-	//? loading the array with whatever was written in the box at get-product.html
-	const laProducione = productsData;
-	res.render('shops', {
-		leProdo: laProducione,
-		pageTitle: 'Main Shop Screen',
+	//? Pull the stored data from the JSON file using the method inside the class
+	//? and then put it in an array that can be used by the pages later
+	Product.fetchAll((callbackProductFetch) => {
+		res.render('shop/user-product-list', {
+			leProdo: callbackProductFetch,
+			pageTitle: 'Main Shop Screen',
+		});
 	});
 };
