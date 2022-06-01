@@ -7,7 +7,37 @@ exports.getShop = (req, res) => {
 	Product.fetchAll((callbackProductFetch) => {
 		res.render('shop/user-product-list', {
 			leProdo: callbackProductFetch,
-			pageTitle: 'Main Shop Screen',
+			pageTitle: 'All items on sale',
 		});
+	});
+};
+
+exports.getHome = (req, res) => {
+	res.render('shop/index', {
+		pageTitle: 'Home',
+	});
+};
+
+exports.getItemDetails = (req, res) => {
+	res.render('shop/product-detail', {
+		pageTitle: 'More information on this item',
+	});
+};
+
+exports.getCart = (req, res) => {
+	res.render('shop/cart', {
+		pageTitle: 'Shopping Cart',
+	});
+};
+
+exports.getItemDetails = (req, res) => {
+	res.render('shop/product-detail', {
+		pageTitle: 'More information on this item',
+	});
+};
+
+exports.getCheckout = (req, res) => {
+	res.render('shop/checkout', {
+		pageTitle: 'Purchase details',
 	});
 };
