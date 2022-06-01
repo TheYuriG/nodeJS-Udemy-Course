@@ -10,6 +10,12 @@ const router = express.Router();
 //? /admin/add-product → GET + get product controller in the controllers folder
 router.get('/add-product', adminController.getProduct);
 
+//? /admin/edit-product → GET + get edit product controller in the controllers folder
+router.get('/edit-product', adminController.getEditProduct);
+
+//? /admin/edit-product → GET + get edit product controller in the controllers folder
+router.get('/products-list', adminController.getProductsList);
+
 //? /admin/add-product → POST + post product controller in the controllers folder
 router.post('/add-product', adminController.postProduct);
 
