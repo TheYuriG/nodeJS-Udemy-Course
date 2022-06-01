@@ -38,14 +38,13 @@ main {
 	color: white;
 }
 
-.main-header__item a:hover,
-.main-header__item a:active,
-.main-header__item a.active {
-	color: yellow;
-}
-
 .main-header__item a.inactive {
 	color: white;
+}
+
+.main-header__item a:hover,
+.main-header__item a.active {
+	color: yellow;
 }
 
 .product-form {
@@ -70,15 +69,23 @@ main {
 }
 
 .form-control label,
-.form-control input {
+.form-control input,
+.form-control textarea {
 	display: block;
 	width: 100%;
 }
 
-.form-control input {
-	border: 3px solid #9b0000;
+.form-control input,
+.form-control textarea {
+	border: 1px solid #9b0000;
 	font: inherit;
 	border-radius: 5px;
+}
+
+.form-control input:focus,
+.form-control textarea:focus {
+	/* border-color: pink; */
+	border: 4px solid pink;
 }
 
 button {
@@ -94,4 +101,5 @@ button:hover,
 button:active {
 	background-color: purple;
 	color: white;
+	border: 3px solid black;
 }
