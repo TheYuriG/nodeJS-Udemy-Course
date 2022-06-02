@@ -18,13 +18,16 @@ exports.getProduct = (req, res) => {
 };
 
 exports.getEditProduct = (req, res) => {
-	//? render the html page based on the EJS engine we defined on the server.js
-	//? and get-product.ejs file that we added to the views folder
 	res.render('admin/edit-product', { pageTitle: 'Edit book details' });
 };
 
 exports.getProductsList = (req, res) => {
-	//? render the html page based on the EJS engine we defined on the server.js
-	//? and get-product.ejs file that we added to the views folder
-	res.render('admin/admin-product-list', { pageTitle: 'Review all books' });
+	//? Pull the stored data from the JSON file using the method inside the class
+	//? and then put it in an array that can be used by the pages later
+	Product.fetchAll((callbackProductFetch) => {
+		res.render('admin/admin-product-list', {
+			adminProducts: callbackProductFetch,
+			pageTitle: 'Review all books',
+		});
+	});
 };
