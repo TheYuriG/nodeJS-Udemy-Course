@@ -19,30 +19,28 @@ exports.getHome = (req, res) => {
 	});
 };
 
+//? Display more details about a book
 exports.getItemDetails = (req, res) => {
 	res.render('shop/product-detail', {
 		pageTitle: 'More information on this item',
 	});
 };
 
+//? Go to the cart page "/cart"
 exports.getCart = (req, res) => {
 	res.render('shop/cart', {
 		pageTitle: 'Shopping Cart',
 	});
 };
 
+//? Go to the orders page "/orders"
 exports.getOrders = (req, res) => {
 	res.render('shop/orders', {
 		pageTitle: 'Orders',
 	});
 };
 
-exports.getItemDetails = (req, res) => {
-	res.render('shop/product-detail', {
-		pageTitle: 'More information on this item',
-	});
-};
-
+//? Go to the cehckout page "/checkout"
 exports.getCheckout = (req, res) => {
 	res.render('shop/checkout', {
 		pageTitle: 'Purchase details',
