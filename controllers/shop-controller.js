@@ -12,6 +12,7 @@ exports.getShop = (req, res) => {
 	});
 };
 
+//? Go to the home page "/"
 exports.getHome = (req, res) => {
 	res.render('shop/index', {
 		pageTitle: 'Home',
@@ -27,6 +28,12 @@ exports.getItemDetails = (req, res) => {
 exports.getCart = (req, res) => {
 	res.render('shop/cart', {
 		pageTitle: 'Shopping Cart',
+	});
+};
+
+exports.getOrders = (req, res) => {
+	res.render('shop/orders', {
+		pageTitle: 'Orders',
 	});
 };
 
