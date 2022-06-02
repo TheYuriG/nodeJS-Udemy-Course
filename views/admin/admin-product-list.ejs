@@ -3,6 +3,39 @@
     <body>
         <%- include('../includes/top-bar.ejs') %>
             <main>
-                <h1>Mega list of admin items!</h1>
+                <% if (adminProducts.length> 0) { %>
+                    <div class="grid">
+                        <% for (let admino of adminProducts) { %>
+                            <article class="card product-item">
+                                <header class="card__header">
+                                    <h1 class="product__title">
+                                        <%= admino.title %>
+                                    </h1>
+                                </header>
+                                <div class="card__image">
+                                    <img class="product__image" src="<%= admino.imageUrl %>"
+                                        alt="<%= admino.title %>" />
+                                </div>
+                                <div class="card__content">
+                                    <h2 class="product__price">R$ <%= admino.price %>
+                                    </h2>
+                                    <p class="product__description">
+                                        <%= admino.description %>
+                                    </p>
+                                </div>
+                                <div class="card__actions">
+                                    <form action="/admin/edit-product" method="POST">
+                                        <button class="btn">Edit</button>
+                                    </form>
+                                    <form action="/admin/delete-product" method="POST">
+                                        <button class="btn">Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                            <% } %>
+                    </div>
+                    <% } else { %>
+                        <h2>Bruv any books?</h2>
+                        <% } %>
             </main>
             <%- include('../includes/footer.ejs') %>
