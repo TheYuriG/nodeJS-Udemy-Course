@@ -4,7 +4,10 @@ exports.postProduct = (req, res) => {
 	res.redirect('/');
 	//? This creates a new class item that will have the title property and then be saved
 	//? using the method that follows
-	const newProduct = new Product(req.body.title, req.body.image, req.body.description, req.body.price);
+	const newProduct = new Product(req.body.title, req.body.imageUrl, req.body.description, req.body.price);
+	//? When creating a new Product item, make sure you are passing the items
+	//? in the correct order that it was defined inside the constructor for the class,
+	//? else stuff will be saved wrong for later use
 	newProduct.save();
 };
 
