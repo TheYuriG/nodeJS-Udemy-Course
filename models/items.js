@@ -19,7 +19,9 @@ module.exports = class Product {
 			}
 			products.push(this);
 			fs.writeFile(pathToBooksJSON, JSON.stringify(products), (writeFileError) => {
-				console.log(writeFileError);
+				if (writeFileError) {
+					console.log(writeFileError);
+				}
 			});
 		});
 	}
