@@ -33,16 +33,16 @@ exports.getCart = (req, res) => {
 	});
 };
 
-//? Go to the orders page "/orders"
-exports.getOrders = (req, res) => {
-	res.render('shop/orders', {
-		pageTitle: 'Orders',
-	});
-};
-
 //? Go to the cehckout page "/checkout"
 exports.getCheckout = (req, res) => {
 	res.render('shop/checkout', {
 		pageTitle: 'Purchase details',
+	});
+};
+
+//? Go to the orders page "/orders"
+exports.getOrders = (req, res) => {
+	res.render('shop/orders', {
+		pageTitle: 'Orders',
 	});
 };

@@ -22,4 +22,7 @@ router.get('/product-detail', shopController.getItemDetails);
 //? Show post-purchase data and delivery details
 router.get('/checkout', shopController.getCheckout);
 
+//? Show post-purchase data and delivery details
+router.get('/orders', shopController.getOrders);
+
 module.exports = router;
