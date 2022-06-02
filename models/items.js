@@ -3,6 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = class Product {
+	//? on the constructor, we are using different names so it's clear what is being
+	//? added and what is being constructed
 	constructor(tito, imago, descripto, prico) {
 		this.title = tito;
 		this.imageUrl = imago;
