@@ -8,6 +8,9 @@ router.get('/', shopController.getIndex);
 
 router.get('/products', shopController.getProducts);
 
+//? Controller to the routes to different items
+router.get('/products/:productId', shopController.getProductDetail);
+
 router.get('/cart', shopController.getCart);
 
 router.get('/orders', shopController.getOrders);
