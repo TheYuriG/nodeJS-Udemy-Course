@@ -13,6 +13,9 @@ router.get('/products/:productId', shopController.getProductDetail);
 
 router.get('/cart', shopController.getCart);
 
+//? Handles the POST request from product-detail into cart and then redirects to GET /cart
+router.post('/cart', shopController.postCart);
+
 router.get('/orders', shopController.getOrders);
 
 router.get('/checkout', shopController.getCheckout);
