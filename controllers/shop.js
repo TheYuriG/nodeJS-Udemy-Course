@@ -1,6 +1,7 @@
 const Product = require('../models/product');
+const Cart = require('../models/cart-class');
 
-exports.getProducts = (req, res, next) => {
+exports.getProducts = (req, res) => {
 	Product.fetchAll((products) => {
 		res.render('shop/product-list', {
 			prods: products,
@@ -11,7 +12,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 //? Controller for individual item details
-exports.getProductDetail = (req, res, next) => {
+exports.getProductDetail = (req, res) => {
 	const prodId = req.params.productId;
 	Product.findBySingleId(prodId, (item) => {
 		res.render('shop/product-detail', {
@@ -22,7 +23,7 @@ exports.getProductDetail = (req, res, next) => {
 	});
 };
 
-exports.getIndex = (req, res, next) => {
+exports.getIndex = (req, res) => {
 	Product.fetchAll((products) => {
 		res.render('shop/index', {
 			prods: products,
@@ -32,32 +33,30 @@ exports.getIndex = (req, res, next) => {
 	});
 };
 
-exports.getCart = (req, res, next) => {
+exports.getCart = (req, res) => {
 	res.render('shop/cart', {
 		path: '/cart',
 		pageTitle: 'Your Cart',
 	});
 };
 
-exports.postCart = (req, res, next) => {
+//? Handles the POST request when clicking any "Add to Cart" buttons
+exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
-	console.log(productoId);
+	Product.findBySingleId(productoId, (producterino) => {
+		Cart.addProductToCart(producterino.id, producterino.price);
+	});
 	res.redirect('/cart');
-
-	// res.render('shop/cart', {
-	// 	path: '/cart',
-	// 	pageTitle: 'Your Cart',
-	// });
 };
 
-exports.getOrders = (req, res, next) => {
+exports.getOrders = (req, res) => {
 	res.render('shop/orders', {
 		path: '/orders',
 		pageTitle: 'Your Orders',
 	});
 };
 
-exports.getCheckout = (req, res, next) => {
+exports.getCheckout = (req, res) => {
 	res.render('shop/checkout', {
 		path: '/checkout',
 		pageTitle: 'Checkout',

@@ -1,0 +1,7 @@
+{
+	"products": [
+		{ "id": "4868", "price": "19.99", "units": 3 },
+		{ "id": "90", "price": "199.99", "units": 3 }
+	],
+	"totalPrice": 659.94
+}
