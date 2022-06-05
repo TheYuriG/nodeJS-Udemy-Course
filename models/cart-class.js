@@ -8,26 +8,35 @@ const pathToCartData = path.join(path.dirname(require.main.filename), 'data', 'c
 //? Creates a class that will be responsible for creating, reading and managing the user cart
 module.exports = class Cart {
 	static addProductToCart(idOfItemToBeAdded, priceOfItemToBeAdded) {
-		// Fetch previous cart saved on the disk
+		//? Checks if there is an old cart saved and fetches it data if so
 		fs.readFile(pathToCartData, (readingFileError, cartDataContent) => {
+			//? Defines the cart for this user as empty to populate it if
+			//? the user had a saved cart or supply a new one if not
 			let userCart = { products: [], totalPrice: 0.0 };
 			if (!readingFileError) {
+				//? If reading the file doesn't error, replace current cart
+				//? with old cart
 				userCart = JSON.parse(cartDataContent);
 			}
-			// Analyze the cart, look for existing product
+			//? Check if the cart, new or old, contains the item that is being
+			//? attempted to get added. Searches the cart by the item ID and returns
+			//? the index of the item if found, returns -1 otherwise
 			const existingProductArrayIndex = userCart.products.findIndex((prod) => prod.id === idOfItemToBeAdded);
-			let updatedProduct;
-			// Add new product if doesn't exist, increase quantity of product if it does
+			//? Checks if the product was found in the array
+			//? (will return 0 or greater as index number)
 			if (existingProductArrayIndex >= 0) {
-				// const theProduct = userCart.products[existingProductArrayIndex];
+				//? If the item was found within the array using findIndex(),
+				//? increase the number of units for this item in the cart
 				userCart.products[existingProductArrayIndex].units++;
 			} else {
-				updatedProduct = { id: idOfItemToBeAdded, price: priceOfItemToBeAdded, units: 1 };
-				userCart.products.push(updatedProduct);
+				//? If the item wasn't found, push the data of this item to the cart
+				userCart.products.push({ id: idOfItemToBeAdded, price: priceOfItemToBeAdded, units: 1 });
 			}
-			userCart.totalPrice += +priceOfItemToBeAdded;
-			//.toFixed(2);
-			// userCart.products = [...cart.products];
+			//? Half-ass calculate the total price of the cart as taught in the lesson
+			// TODO refactorate this to actually iterate the array and multiply
+			// TODO item price * item units to get the actual price (use reduce())
+			userCart.totalPrice += +priceOfItemToBeAdded; //? A plus sign just before a variable is the shorthand way to convert the variable to number
+			//? Once all the data processing has been done, save the file to "carterino.json"
 			fs.writeFile(pathToCartData, JSON.stringify(userCart), (readingFileError) => {
 				if (readingFileError) {
 					console.log(readingFileError);
