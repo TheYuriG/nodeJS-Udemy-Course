@@ -29,10 +29,14 @@
                         <textarea name="description" id="description"
                             rows="3"><% if (editing) { %><%= query.description %><% } %></textarea>
                     </div>
+                    <% if (editing) { %>
+                        <input type="hidden" value="<%= query.id %>" name="id">
 
-                    <button class="btn" type="submit">
-                        <% if (editing) { %>Edit Product<% } else { %>Add Product<%} %>
-                    </button>
+                        <% } %>
+
+                            <button class="btn" type="submit">
+                                <% if (editing) { %>Edit Product<% } else { %>Add Product<%} %>
+                            </button>
                 </form>
             </main>
             <%- include('../includes/end.ejs') %>
