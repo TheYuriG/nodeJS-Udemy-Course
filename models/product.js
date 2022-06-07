@@ -32,8 +32,22 @@ module.exports = class Product {
 				products.push(this);
 			}
 			fs.writeFile(p, JSON.stringify(products), (err) => {
-				console.log(err);
+				if (err) console.log(err);
 			});
+		});
+	}
+
+	static itemDeleteById(id) {
+		getProductsFromFile((products) => {
+			const existingProductIndex = products.findIndex((produrino) => produrino.id === id);
+			if (existingProductIndex >= 0) {
+				products.splice(existingProductIndex, 1);
+				fs.writeFile(p, JSON.stringify(products), (err) => {
+					if (err) console.log(err);
+				});
+			} else {
+				console.log(`Item with ${id} doesn't exist!`);
+			}
 		});
 	}
 
