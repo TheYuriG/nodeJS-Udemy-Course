@@ -1,11 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-//? Creates a path to the initial file, then navigate to the data folder and then loads
-//? the carterino.json file, if it exists. Creates it if it doesn't
+//? Creates a path to the initial file, then navigate to the data folder and
+//? then loads the carterino.json file, if it exists. Creates it if it doesn't
 const pathToCartData = path.join(path.dirname(require.main.filename), 'data', 'carterino.json');
 
-//? Creates a class that will be responsible for creating, reading and managing the user cart
+//? Creates a class that will be responsible for creating,
+//? reading and managing the user cart
 module.exports = class Cart {
 	static addProductToCart(idOfItemToBeAdded, priceOfItemToBeAdded) {
 		//? Checks if there is an old cart saved and fetches it data if so
@@ -47,22 +48,38 @@ module.exports = class Cart {
 		});
 	}
 
+	//? Static function to remove an item from the cart
+	//? This gets called from within the Product class for now, but will
+	//? also be called from inside the cart page at a later point
 	static yeetTheProduct(itemDeletionId) {
+		//? Read the carterino.json file to fetch the userCart
 		fs.readFile(pathToCartData, (readingFileError, cartDataContent) => {
 			if (readingFileError) {
 				return;
 			}
 			let userCart = JSON.parse(cartDataContent);
+
+			//? Finds the position of the item in the cart for now
+			//! Optionally, you could just retrieve the product with .find()
 			const removedProductArrayIndex = userCart.products.findIndex(
 				(producterino) => producterino.id === itemDeletionId
 			);
 			console.log('old cart price', userCart.totalPrice);
+
+			//? Update userCart totalPrice property considering the price of the
+			//? item and how many times it had been added to the cart
 			userCart.totalPrice -=
 				userCart.products[removedProductArrayIndex].price * userCart.products[removedProductArrayIndex].units;
 			console.log('removed item quantity (units)', userCart.products[removedProductArrayIndex].units);
 			console.log('removed item individual price', userCart.products[removedProductArrayIndex].price);
 			console.log('updated cart price', userCart.totalPrice);
+
+			//? Finally remove the item from the cart and update the userCart totalPrice property
+			//! Optionally, you could remove the item with .filter()
 			userCart.products.splice(removedProductArrayIndex, 1);
+
+			//? Save the updated cart (without the item and with its totalPrice updated)
+			//? back to the carterino.json file again
 			fs.writeFile(pathToCartData, JSON.stringify(userCart), (readingFileError) => {
 				if (readingFileError) {
 					console.log(readingFileError);
