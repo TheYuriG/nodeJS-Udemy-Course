@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Cart = require('./cart-class');
 
 const p = path.join(path.dirname(require.main.filename), 'data', 'products.json');
 
@@ -45,6 +46,7 @@ module.exports = class Product {
 				fs.writeFile(p, JSON.stringify(products), (err) => {
 					if (err) console.log(err);
 				});
+				Cart.yeetTheProduct(id);
 			} else {
 				console.log(`Item with ${id} doesn't exist!`);
 			}
