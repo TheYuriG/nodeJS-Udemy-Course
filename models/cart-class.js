@@ -46,4 +46,30 @@ module.exports = class Cart {
 			});
 		});
 	}
+
+	static yeetTheProduct(itemDeletionId) {
+		fs.readFile(pathToCartData, (readingFileError, cartDataContent) => {
+			if (readingFileError) {
+				return;
+			}
+			let userCart = JSON.parse(cartDataContent);
+			const removedProductArrayIndex = userCart.products.findIndex(
+				(producterino) => producterino.id === itemDeletionId
+			);
+			console.log('old cart price', userCart.totalPrice);
+			userCart.totalPrice -=
+				userCart.products[removedProductArrayIndex].price * userCart.products[removedProductArrayIndex].units;
+			console.log('removed item quantity (units)', userCart.products[removedProductArrayIndex].units);
+			console.log('removed item individual price', userCart.products[removedProductArrayIndex].price);
+			console.log('updated cart price', userCart.totalPrice);
+			userCart.products.splice(removedProductArrayIndex, 1);
+			fs.writeFile(pathToCartData, JSON.stringify(userCart), (readingFileError) => {
+				if (readingFileError) {
+					console.log(readingFileError);
+				} else {
+					console.log('items removed, updated cart saved!');
+				}
+			});
+		});
+	}
 };
