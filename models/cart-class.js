@@ -64,6 +64,13 @@ module.exports = class Cart {
 			const removedProductArrayIndex = userCart.products.findIndex(
 				(producterino) => producterino.id === itemDeletionId
 			);
+
+			//? This is an error checked in case this item doesn't exist in
+			//? the cart, therefore skips trying to delete such item
+			if (removedProductArrayIndex == -1) {
+				return;
+			}
+
 			console.log('old cart price', userCart.totalPrice);
 
 			//? Update userCart totalPrice property considering the price of the
