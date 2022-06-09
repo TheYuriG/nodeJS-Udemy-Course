@@ -71,15 +71,10 @@ module.exports = class Cart {
 				return;
 			}
 
-			console.log('old cart price', userCart.totalPrice);
-
 			//? Update userCart totalPrice property considering the price of the
 			//? item and how many times it had been added to the cart
 			userCart.totalPrice -=
 				userCart.products[removedProductArrayIndex].price * userCart.products[removedProductArrayIndex].units;
-			console.log('removed item quantity (units)', userCart.products[removedProductArrayIndex].units);
-			console.log('removed item individual price', userCart.products[removedProductArrayIndex].price);
-			console.log('updated cart price', userCart.totalPrice);
 
 			//? Finally remove the item from the cart and update the userCart totalPrice property
 			//! Optionally, you could remove the item with .filter()
@@ -90,8 +85,6 @@ module.exports = class Cart {
 			fs.writeFile(pathToCartData, JSON.stringify(userCart), (readingFileError) => {
 				if (readingFileError) {
 					console.log(readingFileError);
-				} else {
-					console.log('items removed, updated cart saved!');
 				}
 			});
 		});
