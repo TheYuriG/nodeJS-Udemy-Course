@@ -62,6 +62,15 @@ exports.postCart = (req, res) => {
 	res.redirect('/cart');
 };
 
+//? Handles the POST request when clicking any "Add to Cart" buttons
+exports.postCartDeletion = (req, res) => {
+	const productoId = req.body.idOfItemToBeDeleted;
+	Product.findBySingleId(productoId, (databaseItem) => {
+		Cart.yeetTheProduct(productoId, databaseItem.price);
+		res.redirect('/cart');
+	});
+};
+
 exports.getOrders = (req, res) => {
 	res.render('shop/orders', {
 		path: '/orders',
