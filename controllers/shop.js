@@ -33,10 +33,22 @@ exports.getIndex = (req, res) => {
 	});
 };
 
+//? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
-	res.render('shop/cart', {
-		path: '/cart',
-		pageTitle: 'Your Cart',
+	Cart.getCart((cart) => {
+		Product.fetchAll((allItems) => {
+			const cartItemsArray = [];
+			for (const item of allItems) {
+				if (cart.products.find((prod) => prod.id === item.id)) {
+					cartItemsArray.push({ cartItemsList: item, howMany: prod.units });
+				}
+			}
+			res.render('shop/cart', {
+				path: '/cart',
+				pageTitle: 'Your Cart',
+				products: cartItemsArray,
+			});
+		});
 	});
 };
 

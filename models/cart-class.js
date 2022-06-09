@@ -89,4 +89,14 @@ module.exports = class Cart {
 			});
 		});
 	}
+
+	static getCart(callbackToFetchedCart) {
+		fs.readFile(pathToCartData, (failedToLoadCart, cartLoaded) => {
+			if (failedToLoadCart) {
+				callbackToFetchedCart(null);
+			} else {
+				callbackToFetchedCart(JSON.parse(cartLoaded));
+			}
+		});
+	}
 };
