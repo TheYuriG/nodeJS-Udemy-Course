@@ -39,14 +39,15 @@ exports.getCart = (req, res) => {
 		Product.fetchAll((allItems) => {
 			const cartItemsArray = [];
 			for (const item of allItems) {
-				if (cart.products.find((prod) => prod.id === item.id)) {
-					cartItemsArray.push({ cartItemsList: item, howMany: prod.units });
+				const currentCartItem = cart.products.find((prod) => prod.id === item.id);
+				if (currentCartItem) {
+					cartItemsArray.push({ cartItemsList: item, howMany: currentCartItem.units });
 				}
 			}
 			res.render('shop/cart', {
 				path: '/cart',
 				pageTitle: 'Your Cart',
-				products: cartItemsArray,
+				cartItems: cartItemsArray,
 			});
 		});
 	});
