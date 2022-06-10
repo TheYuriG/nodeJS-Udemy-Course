@@ -16,8 +16,12 @@ exports.postAddProduct = (req, res) => {
 	const price = req.body.price;
 	const description = req.body.description;
 	const product = new Product(null, title, imageUrl, description, price);
-	product.save();
-	res.redirect('/');
+	product
+		.save()
+		.then(() => {
+			res.redirect('/');
+		})
+		.catch((err) => console.error(err));
 };
 
 //? Fills the forms with data of a given product and allows editing it
@@ -69,8 +73,12 @@ exports.postEditProduct = (req, res) => {
 	const price = req.body.price;
 	const description = req.body.description;
 	const updatedProduct = new Product(id, title, imageUrl, description, price);
-	updatedProduct.save();
-	res.redirect('/admin/products');
+	updatedProduct
+		.save()
+		.then(() => {
+			res.redirect('/admin/products');
+		})
+		.catch((err) => console.error(err));
 };
 
 //? Processes the item deletion request from clicking "Delete" on /admin/products
