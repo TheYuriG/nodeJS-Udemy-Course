@@ -88,11 +88,13 @@ exports.deleteProduct = (req, res) => {
 
 //? Loads the page to view all products in admin mode (with edit)
 exports.getProducts = (req, res) => {
-	Product.fetchAll((products) => {
-		res.render('admin/products', {
-			prods: products,
-			pageTitle: 'Admin Products',
-			path: '/admin/products',
-		});
-	});
+	Product.fetchAll()
+		.then(([data, databaseUselessData]) => {
+			res.render('admin/products', {
+				prods: data,
+				pageTitle: 'Admin Products',
+				path: '/admin/products',
+			});
+		})
+		.catch((err) => console.log(err));
 };
