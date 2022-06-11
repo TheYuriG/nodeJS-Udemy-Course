@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 
-//? Pull the Cart class so we can delete items from Cart if they get
-//? removed from the products database
-const Cart = require('./cart-class');
+// //? Pull the Cart class so we can delete items from Cart if they get
+// //? removed from the products database
+// const Cart = require('./cart-class');
 
 //? Imports the database util
 const seq = require('../util/base-of-data.js');
@@ -29,6 +29,10 @@ const Product = seq.define('product', {
 	},
 	description: {
 		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	userId: {
+		type: Sequelize.INTEGER,
 		allowNull: false,
 	},
 });
