@@ -11,6 +11,8 @@ const seq = require('./util/base-of-data.js');
 //? Import the user and the product so they can be related below
 const User = require('./models/user');
 const Product = require('./models/product');
+const Cart = require('./models/cart-class');
+const CartItem = require('./models/cart-item');
 
 //? Starts express
 const app = express();
@@ -49,10 +51,14 @@ Product.belongsTo(User, { constrains: true, onDelete: 'CASCADE' });
 //? onDelete = cascade means that if an user gets deleted, all products
 //? associated to that user will also get deleted
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
 
 //? Makes the database and the sequelize util sync and actually check for
 //? the same type of data on both sides
-seq.sync()
+seq.sync({ force: true })
 	.then(() => {
 		return User.findByPk(1);
 	})
