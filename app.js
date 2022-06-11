@@ -19,14 +19,17 @@ app.set('views', 'views');
 //? Separates the routes for shop and admin-related pages
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-app.use('/admin', adminRoutes);
-app.use(shopRoutes);
-app.use(errorController.get404);
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
 //? Enables the css folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
+
+//? Only start the routes after the bodyparser has been made available and
+//? the CSS files are made public
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+app.use(errorController.get404);
 
 //? Makes the database and the sequelize util sync and actually check for
 //? the same type of data on both sides
