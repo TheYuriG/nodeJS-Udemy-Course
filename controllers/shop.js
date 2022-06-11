@@ -46,11 +46,16 @@ exports.getCart = (req, res) => {
 			.then((allItems) => {
 				const cartItemsArray = [];
 				for (const item of allItems) {
+					//? If the cart exist, look through it and find the products
+					//? and then look them up on the database
 					const currentCartItem = cart.products.find((prod) => prod.id === item.id);
 					if (currentCartItem) {
 						cartItemsArray.push({ cartItemsList: item, howMany: currentCartItem.units });
 					}
 				}
+
+				//? Render the cart page with whatever content there is in the cart or
+				//? just an empty cart
 				res.render('shop/cart', {
 					path: '/cart',
 					pageTitle: 'Your Cart',

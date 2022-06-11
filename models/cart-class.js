@@ -93,7 +93,7 @@ module.exports = class Cart {
 	static getCart(callbackToFetchedCart) {
 		fs.readFile(pathToCartData, (failedToLoadCart, cartLoaded) => {
 			if (failedToLoadCart) {
-				callbackToFetchedCart(null);
+				callbackToFetchedCart({ products: [], totalPrice: 0.0 });
 			} else {
 				callbackToFetchedCart(JSON.parse(cartLoaded));
 			}
