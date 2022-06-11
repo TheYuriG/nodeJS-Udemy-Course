@@ -2,8 +2,8 @@ const Product = require('../models/product');
 const Cart = require('../models/cart-class');
 
 exports.getProducts = (req, res) => {
-	Product.fetchAll()
-		.then(([data, databaseUselessData]) => {
+	Product.findAll()
+		.then((data) => {
 			res.render('shop/product-list', {
 				prods: data,
 				pageTitle: 'All Products',
@@ -16,11 +16,11 @@ exports.getProducts = (req, res) => {
 //? Controller for individual item details
 exports.getProductDetail = (req, res) => {
 	const prodId = req.params.productId;
-	Product.findBySingleId(prodId)
-		.then(([item]) => {
+	Product.findByPk(prodId)
+		.then((item) => {
 			res.render('shop/product-detail', {
-				product: item[0],
-				pageTitle: item[0].title,
+				product: item,
+				pageTitle: item.title,
 				path: '/products',
 			});
 		})
@@ -28,8 +28,8 @@ exports.getProductDetail = (req, res) => {
 };
 
 exports.getIndex = (req, res) => {
-	Product.fetchAll()
-		.then(([data, databaseUselessData]) => {
+	Product.findAll()
+		.then((data) => {
 			res.render('shop/index', {
 				prods: data,
 				pageTitle: 'Shop',
@@ -42,27 +42,29 @@ exports.getIndex = (req, res) => {
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
 	Cart.getCart((cart) => {
-		Product.fetchAll((allItems) => {
-			const cartItemsArray = [];
-			for (const item of allItems) {
-				const currentCartItem = cart.products.find((prod) => prod.id === item.id);
-				if (currentCartItem) {
-					cartItemsArray.push({ cartItemsList: item, howMany: currentCartItem.units });
+		Product.findAll()
+			.then((allItems) => {
+				const cartItemsArray = [];
+				for (const item of allItems) {
+					const currentCartItem = cart.products.find((prod) => prod.id === item.id);
+					if (currentCartItem) {
+						cartItemsArray.push({ cartItemsList: item, howMany: currentCartItem.units });
+					}
 				}
-			}
-			res.render('shop/cart', {
-				path: '/cart',
-				pageTitle: 'Your Cart',
-				cartItems: cartItemsArray,
-			});
-		});
+				res.render('shop/cart', {
+					path: '/cart',
+					pageTitle: 'Your Cart',
+					cartItems: cartItemsArray,
+				});
+			})
+			.catch((e) => console.log(e));
 	});
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
-	Product.findBySingleId(productoId, (producterino) => {
+	Product.findByPk(productoId, (producterino) => {
 		Cart.addProductToCart(producterino.id, producterino.price);
 	});
 	res.redirect('/cart');
@@ -71,7 +73,7 @@ exports.postCart = (req, res) => {
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCartDeletion = (req, res) => {
 	const productoId = req.body.idOfItemToBeDeleted;
-	Product.findBySingleId(productoId, (databaseItem) => {
+	Product.findByPk(productoId, (databaseItem) => {
 		Cart.yeetTheProduct(productoId, databaseItem.price);
 		res.redirect('/cart');
 	});

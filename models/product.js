@@ -7,6 +7,7 @@ const Cart = require('./cart-class');
 //? Imports the database util
 const seq = require('../util/base-of-data.js');
 
+//? Defines what the DB should use or create as default table
 const Product = seq.define('product', {
 	id: {
 		type: Sequelize.INTEGER,
@@ -20,7 +21,6 @@ const Product = seq.define('product', {
 	},
 	price: {
 		type: Sequelize.DOUBLE,
-
 		allowNull: false,
 	},
 	imageUrl: {
