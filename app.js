@@ -8,6 +8,9 @@ const bodyParser = require('body-parser');
 //? Project imports
 const errorController = require('./controllers/error');
 const seq = require('./util/base-of-data.js');
+//? Import the user and the product so they can be related below
+const User = require('./models/user');
+const Product = require('./models/product');
 
 //? Starts express
 const app = express();
@@ -25,15 +28,43 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //? Enables the css folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+	User.findByPk(1)
+		.then((databaseUser) => {
+			req.user = databaseUser;
+			next();
+		})
+		.catch((e) => console.log(e));
+});
+
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(errorController.get404);
 
+//? Assigns the relation between two tables. If not done before the tables are
+//? first created, this will reset both tables to then link them
+Product.belongsTo(User, { constrains: true, onDelete: 'CASCADE' });
+//? onDelete = cascade means that if an user gets deleted, all products
+//? associated to that user will also get deleted
+User.hasMany(Product);
+
 //? Makes the database and the sequelize util sync and actually check for
 //? the same type of data on both sides
-seq.sync();
-
-//? Sets up which port this website will be displayed to on localhost
-app.listen(3000);
+seq.sync()
+	.then(() => {
+		return User.findByPk(1);
+	})
+	.then((user) => {
+		if (!user) {
+			User.create({ name: 'YuriG', email: 'theyurig@emaildomain.com', password: 'shopPassword' });
+		}
+		return Promise.resolve(user);
+	})
+	.then((user) => {
+		//? Sets up which port this website will be displayed to on localhost
+		//? if the database fully connects as it should
+		app.listen(3000);
+	})
+	.catch((e) => console.log(e));
