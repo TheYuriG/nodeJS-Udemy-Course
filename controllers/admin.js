@@ -11,13 +11,23 @@ exports.getAddProduct = (req, res) => {
 
 //? Processes the data request of adding a product
 exports.postAddProduct = (req, res) => {
+	//? Grabs all data from the request body
 	const title = req.body.title;
 	const imageUrl = req.body.imageUrl;
 	const price = req.body.price;
 	const description = req.body.description;
-	Product.create({ title: title, imageUrl: imageUrl, description: description, price: price }).then(
-		res.redirect('/')
-	);
+
+	//? Uses the createTableName to create an Product based off the user
+	//? Sequelize object being passed in the request
+	req.user
+		.createProduct({
+			title: title,
+			imageUrl: imageUrl,
+			description: description,
+			price: price,
+			userId: req.user.id,
+		})
+		.then(res.redirect('/'));
 };
 
 //? Fills the forms with data of a given product and allows editing it
@@ -34,7 +44,7 @@ exports.getEditProduct = (req, res) => {
 	const prodId = req.params.productId;
 
 	//? Uses the item ID in the request parameters to find the item in the database
-	Product.findByPk(prodId).then((product) => {
+	req.user.getProducts({ where: { id: prodId } }).then((product) => {
 		//? If the item can't be found, redirect to the main page
 		//? This should never happen unless the user is manually trying to access
 		//? a page that doesn't exist or the user is using multiple tabs on the
@@ -98,9 +108,11 @@ exports.deleteProduct = (req, res) => {
 		.catch((e) => console.log(e));
 };
 
-//? Loads the page to view all products in admin mode (with edit)
+//? Loads the page to view all products in admin mode (with edit) only for
+//? the user currently logged in (userId == 1)
 exports.getProducts = (req, res) => {
-	Product.findAll()
+	req.user
+		.getProducts()
 		.then((data) => {
 			res.render('admin/products', {
 				prods: data,
