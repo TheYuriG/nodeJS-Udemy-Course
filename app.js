@@ -9,24 +9,28 @@ const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
 const seq = require('./util/base-of-data.js');
 
+//? Starts express
 const app = express();
 
+//? Sets up EJS as the view engine and explicitly define the views folder
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+//? Separates the routes for shop and admin-related pages
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-
 app.use(errorController.get404);
 
-seq.sync()
-	.then()
-	.catch((e) => console.log(e));
+//? Automatically parses body messages, so other commands can use req.body
+app.use(bodyParser.urlencoded({ extended: false }));
+//? Enables the css folders to be publicly accessed at any point
+app.use(express.static(path.join(__dirname, 'public')));
 
+//? Makes the database and the sequelize util sync and actually check for
+//? the same type of data on both sides
+seq.sync();
+
+//? Sets up which port this website will be displayed to on localhost
 app.listen(3000);
