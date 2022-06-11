@@ -1,35 +1,64 @@
+const Sequelize = require('sequelize');
+
 //? Pull the Cart class so we can delete items from Cart if they get
 //? removed from the products database
 const Cart = require('./cart-class');
 
 //? Imports the database util
-const db = require('../util/base-of-data.js');
+const seq = require('../util/base-of-data.js');
 
-module.exports = class Product {
-	constructor(id, title, imageUrl, description, price) {
-		this.id = id;
-		this.title = title;
-		this.imageUrl = imageUrl;
-		this.description = description;
-		this.price = price;
-	}
+const Product = seq.define('product', {
+	id: {
+		type: Sequelize.INTEGER,
+		autoIncrement: true,
+		allowNull: false,
+		primaryKey: true,
+	},
+	title: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	price: {
+		type: Sequelize.DOUBLE,
 
-	save() {
-		return db.execute('INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)', [
-			this.title,
-			this.price,
-			this.imageUrl,
-			this.description,
-		]);
-	}
+		allowNull: false,
+	},
+	imageUrl: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+	description: {
+		type: Sequelize.STRING,
+		allowNull: false,
+	},
+});
 
-	static itemDeleteById(id) {}
+module.exports = Product;
+// {
+// 	constructor(id, title, imageUrl, description, price) {
+// 		this.id = id;
+// 		this.title = title;
+// 		this.imageUrl = imageUrl;
+// 		this.description = description;
+// 		this.price = price;
+// 	}
 
-	static fetchAll() {
-		return db.execute('SELECT * FROM products');
-	}
+// 	save() {
+// 		return db.execute('INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)', [
+// 			this.title,
+// 			this.price,
+// 			this.imageUrl,
+// 			this.description,
+// 		]);
+// 	}
 
-	static findBySingleId(id) {
-		return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-	}
-};
+// 	static itemDeleteById(id) {}
+
+// 	static fetchAll() {
+// 		return db.execute('SELECT * FROM products');
+// 	}
+
+// 	static findBySingleId(id) {
+// 		return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
+// 	}
+// };
