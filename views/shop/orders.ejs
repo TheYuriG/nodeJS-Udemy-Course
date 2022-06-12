@@ -3,7 +3,32 @@
 
     <body>
         <%- include('../includes/navigation.ejs') %>
-        <main>
-            <h1>Nothing there!</h1>
-        </main>
-        <%- include('../includes/end.ejs') %>
+            <main>
+                <% if (orders.length> 0) { %>
+                    <ul>
+                        <% orders.forEach(item=> { %>
+                            <li>
+                                <h1>
+                                    Order #<%= item.id %>
+                                </h1>
+                                <ul>
+                                    <% item.products.forEach(product=> { %>
+                                        <li>
+                                            <%= product.title %> (<%= product.orderItem.quantity %>)
+                                        </li>
+                                        <% }) %>
+                                </ul>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <hr>
+                    <div class="centered">
+                        <form action="/order-this-cart" method="POST">
+                            <button type="submit" class="btn">Order Now!</button>
+                        </form>
+                    </div>
+                    <% } else { %>
+                        <h1>Nothing there!</h1>
+                        <% } %>
+            </main>
+            <%- include('../includes/end.ejs') %>

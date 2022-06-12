@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const Cart = require('../models/cart-class');
 
 exports.getProducts = (req, res) => {
 	Product.findAll()
@@ -115,18 +114,49 @@ exports.postCartDeletion = (req, res) => {
 		.catch((e) => console.log(e));
 };
 
+//? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrders = (req, res) => {
-	res.render('shop/orders', {
-		path: '/orders',
-		pageTitle: 'Your Orders',
-	});
+	req.user
+		.getOrders({ include: ['products'] })
+		.then((orderino) => {
+			res.render('shop/orders', {
+				path: '/orders',
+				pageTitle: 'Your Orders',
+				orders: orderino,
+			});
+		})
+		.catch((e) => console.log(e));
 };
 
-exports.getCheckout = (req, res) => {
-	res.render('shop/checkout', {
-		path: '/checkout',
-		pageTitle: 'Checkout',
-	});
+//? Handles the POST request when proceeding to checkout from cart
+exports.postOrders = (req, res) => {
+	let fetchedCart;
+	req.user
+		.getCart()
+		.then((cart) => {
+			fetchedCart = cart;
+			return cart.getProducts();
+		})
+		.then((products) => {
+			return req.user
+				.createOrder()
+				.then((order) => {
+					return order.addProducts(
+						products.map((product) => {
+							product.orderItem = { quantity: product.cartItem.quantity };
+							return product;
+						})
+					);
+				})
+				.then(() => {
+					return fetchedCart.setProducts(null);
+				})
+				.then(() => {
+					res.redirect('/orders');
+				})
+				.catch((e) => console.log(e));
+		})
+		.catch((e) => console.log(e));
 };
 
 // exports.getCheckout = (req, res) => {

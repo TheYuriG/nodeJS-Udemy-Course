@@ -19,7 +19,12 @@ router.post('/cart', shopController.postCart);
 //? Handles the deletion POST request from cart so the user can remove items before checkout
 router.post('/cart-delete-item', shopController.postCartDeletion);
 
+//? Handles a GET request to /orders
 router.get('/orders', shopController.getOrders);
+
+//? Handles the POST request to "/order-this-cart" when clicking
+//? the "Order Now!" button in "/cart"
+router.post('/order-this-cart', shopController.postOrders);
 
 // router.get('/checkout', shopController.getCheckout);
 
