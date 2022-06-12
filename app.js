@@ -13,6 +13,8 @@ const User = require('./models/user');
 const Product = require('./models/product');
 const Cart = require('./models/cart-class');
 const CartItem = require('./models/cart-item');
+const Order = require('./models/order-class');
+const OrderItem = require('./models/order-item');
 
 //? Starts express
 const app = express();
@@ -55,6 +57,9 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
 
 //? Makes the database and the sequelize util sync and actually check for
 //? the same type of data on both sides
