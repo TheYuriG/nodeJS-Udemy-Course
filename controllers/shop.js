@@ -128,3 +128,10 @@ exports.getCheckout = (req, res) => {
 		pageTitle: 'Checkout',
 	});
 };
+
+// exports.getCheckout = (req, res) => {
+// 	res.render('shop/checkout', {
+// 		path: '/checkout',
+// 		pageTitle: 'Checkout',
+// 	});
+// };
