@@ -58,17 +58,22 @@ Product.belongsToMany(Cart, { through: CartItem });
 
 //? Makes the database and the sequelize util sync and actually check for
 //? the same type of data on both sides
-seq.sync({ force: true })
+seq
+	// .sync({ force: true })
+	.sync()
 	.then(() => {
 		return User.findByPk(1);
 	})
 	.then((user) => {
 		if (!user) {
-			User.create({ name: 'YuriG', email: 'theyurig@emaildomain.com', password: 'shopPassword' });
+			return User.create({ name: 'YuriG', email: 'theyurig@emaildomain.com', password: 'shopPassword' });
 		}
 		return Promise.resolve(user);
 	})
 	.then((user) => {
+		if (user.getCart()) {
+			user.createCart();
+		}
 		//? Sets up which port this website will be displayed to on localhost
 		//? if the database fully connects as it should
 		app.listen(3000);
