@@ -18,7 +18,7 @@ app.set('views', 'views');
 
 //? Separates the routes for shop and admin-related pages
 const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public
 app.use('/admin', adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoDB.mongoConnect(() => {

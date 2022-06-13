@@ -1,8 +1,15 @@
+const Product = require('../models/product');
+
 exports.getProducts = (req, res) => {
-	res.render('shop/product-list', {
-		pageTitle: 'All Products',
-		path: '/products',
-	});
+	Product.fetchAll()
+		.then((products) => {
+			res.render('shop/product-list', {
+				pageTitle: 'All Products',
+				path: '/products',
+				prods: products,
+			});
+		})
+		.catch((e) => console.log(e));
 };
 
 //? Controller for individual item details
@@ -15,11 +22,15 @@ exports.getProductDetail = (req, res) => {
 };
 
 exports.getIndex = (req, res) => {
-	res.render('shop/index', {
-		prods: data,
-		pageTitle: 'Shop',
-		path: '/',
-	});
+	Product.fetchAll()
+		.then((products) => {
+			res.render('shop/index', {
+				prods: products,
+				pageTitle: 'Shop',
+				path: '/',
+			});
+		})
+		.catch((e) => console.log(e));
 };
 
 //? Method to pull all cart items and then use their data
