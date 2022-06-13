@@ -5,7 +5,7 @@ const adminController = require('../controllers/admin');
 const router = express.Router();
 
 //? Loads all products but on the admin end
-router.get('/products', adminController.getProducts);
+// router.get('/products', adminController.getProducts);
 
 //? Loads the page with the form to add a new item. Despite the route being
 //? to "/add", this will actually load "/edit" as "/add" was deleted previously
@@ -16,12 +16,12 @@ router.post('/add-product', adminController.postAddProduct);
 
 //? Edit a specific product that already belongs to the database
 //? while supplying all of its initial data to hasten the edit process
-router.get('/edit-product/:productId', adminController.getEditProduct);
+// router.get('/edit-product/:productId', adminController.getEditProduct);
 
 //? Handles the request to editing an item from the database
-router.post('/edit-product', adminController.postEditProduct);
+// router.post('/edit-product', adminController.postEditProduct);
 
 //? Handles the item deletion request
-router.post('/delete-product/:productId', adminController.deleteProduct);
+// router.post('/delete-product/:productId', adminController.deleteProduct);
 
 module.exports = router;
