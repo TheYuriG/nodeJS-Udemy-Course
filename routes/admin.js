@@ -5,7 +5,7 @@ const adminController = require('../controllers/admin');
 const router = express.Router();
 
 //? Loads all products but on the admin end
-// router.get('/products', adminController.getProducts);
+router.get('/products', adminController.getProducts);
 
 //? Loads the page with the form to add a new item. Despite the route being
 //? to "/add", this will actually load "/edit" as "/add" was deleted previously

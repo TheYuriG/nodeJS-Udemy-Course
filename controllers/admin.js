@@ -85,12 +85,16 @@ exports.postAddProduct = (req, res) => {
 // 	res.redirect('/admin/products');
 // };
 
-// //? Loads the page to view all products in admin mode (with edit) only for
-// //? the user currently logged in (userId == 1)
-// exports.getProducts = (req, res) => {
-// 	res.render('admin/products', {
-// 		prods: data,
-// 		pageTitle: 'Admin Products',
-// 		path: '/admin/products',
-// 	});
-// };
+//? Loads the page to view all products in admin mode (with edit) only for
+//? the user currently logged in (userId == 1)
+exports.getProducts = (req, res) => {
+	Product.fetchAll()
+		.then((products) => {
+			res.render('admin/products', {
+				prods: products,
+				pageTitle: 'Admin Products',
+				path: '/admin/products',
+			});
+		})
+		.catch((e) => console.log(e));
+};

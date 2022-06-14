@@ -9,16 +9,26 @@ exports.getProducts = (req, res) => {
 				prods: products,
 			});
 		})
-		.catch((e) => console.log(e));
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 //? Controller for individual item details
 exports.getProductDetail = (req, res) => {
-	res.render('shop/product-detail', {
-		product: item,
-		pageTitle: item.title,
-		path: '/products',
-	});
+	Product.findOne(req.params.productId)
+		.then((product) => {
+			res.render('shop/product-detail', {
+				product: product,
+				pageTitle: product.title,
+				path: '/products',
+			});
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 exports.getIndex = (req, res) => {
@@ -30,7 +40,10 @@ exports.getIndex = (req, res) => {
 				path: '/',
 			});
 		})
-		.catch((e) => console.log(e));
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 //? Method to pull all cart items and then use their data

@@ -1,4 +1,5 @@
 const { getDB } = require('../util/base-of-data');
+const mongoDB = require('mongodb');
 
 class Product {
 	constructor(
@@ -33,14 +34,24 @@ class Product {
 			.collection('products')
 			.find()
 			.toArray()
-			.then((produtcs) => {
-				// console.log(produtcs);
-				return produtcs;
+			.then((products) => {
+				// console.log(products);
+				return products;
 			})
 			.catch((err) => console.log(err));
 		//? toArray() will dump the whole database in an array, which is only
 		//? acceptable if you know your dataset is small, otherwise you should
 		//? just stick to use pagination instead. This will be taught later
+	}
+
+	static findOne(productId) {
+		const db = getDB();
+		return db
+			.collection('products')
+			.find({ _id: new mongoDB.ObjectId(productId) })
+			.next()
+			.then((product) => product)
+			.catch((err) => console.log(err));
 	}
 }
 
