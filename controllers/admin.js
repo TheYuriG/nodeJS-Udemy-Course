@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const mongoDB = require('mongodb');
 
 //? Loads the blank page to add a new product rather than editing an old one
 exports.getAddProduct = (req, res) => {
@@ -78,7 +77,7 @@ exports.postEditProduct = (req, res) => {
 	let imageUrl = req.body.imageUrl;
 	let price = req.body.price;
 	let description = req.body.description;
-	let productino = new Product(title, price, description, imageUrl, new mongoDB.ObjectId(id))
+	let productino = new Product(title, price, description, imageUrl, id)
 		.save()
 		.then(() => {
 			console.log('product updated successfully!');
@@ -93,10 +92,13 @@ exports.postEditProduct = (req, res) => {
 exports.deleteProduct = (req, res) => {
 	//? Gets the ID of the item to be deleted through the POST request
 	const deletionID = req.params.productId;
-
-	//? Redirects (reloads) back to the same /admin/products page which will
-	//? now be missing the item you have just requested to delete
-	res.redirect('/admin/products');
+	Product.deleteById(deletionID)
+		.then(() => {
+			//? Redirects (reloads) back to the same /admin/products page which will
+			//? now be missing the item you have just requested to delete
+			res.redirect('/admin/products');
+		})
+		.catch((err) => console.log(err));
 };
 
 //? Loads the page to view all products in admin mode (with edit) only for

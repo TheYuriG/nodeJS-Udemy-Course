@@ -15,7 +15,7 @@ class Product {
 		this.price = price;
 		this.description = description;
 		this.imageUrl = imageUrl;
-		this._id = id;
+		this._id = id ? new mongoDB.ObjectId(id) : null;
 	}
 
 	//? Save the current class instance to the database
@@ -25,7 +25,7 @@ class Product {
 			return db
 				.collection('products') //? products is our default table
 				.updateOne(
-					{ _id: new mongoDB.ObjectId(this._id) }, //? This is the filter
+					{ _id: this._id }, //? This is the filter
 					//? which is used to find which is the document we are trying to update
 					{ $set: this } //? $set is a special mongo keyword for updating the
 					//? entire object of data. "this" provides the same key-value pairs to
@@ -68,6 +68,17 @@ class Product {
 			.next()
 			.then((product) => product)
 			.catch((err) => console.log(err));
+	}
+
+	static deleteById(productId) {
+		const db = getDB();
+		return db
+			.collection('products')
+			.deleteOne({ _id: new mongoDB.ObjectId(productId) })
+			.then(() => {
+				console.log('Sucessfully deleted item');
+			})
+			.catch();
 	}
 }
 
