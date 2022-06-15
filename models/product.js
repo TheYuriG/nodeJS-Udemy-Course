@@ -7,23 +7,39 @@ class Product {
 		title,
 		price,
 		description,
-		imageUrl
+		imageUrl,
+		id
 	) {
 		// this.id = id;
 		this.title = title;
 		this.price = price;
 		this.description = description;
 		this.imageUrl = imageUrl;
+		this._id = id;
 	}
 
 	//? Save the current class instance to the database
 	save() {
 		const db = getDB();
-		return db
-			.collection('products') //? products is our default table
-			.insertOne(this) //? this is the just created object
-			.then() //? you are supposed to console.log the result, but no
-			.catch((err) => console.log(err));
+		if (this._id) {
+			return db
+				.collection('products') //? products is our default table
+				.updateOne(
+					{ _id: new mongoDB.ObjectId(this._id) }, //? This is the filter
+					//? which is used to find which is the document we are trying to update
+					{ $set: this } //? $set is a special mongo keyword for updating the
+					//? entire object of data. "this" provides the same key-value pairs to
+					//? $set to use to replace the document data
+				)
+				.then() //? you are supposed to console.log the result, but no we ain't
+				.catch((err) => console.log(err));
+		} else {
+			return db
+				.collection('products') //? products is our default table
+				.insertOne(this) //? this is the just created object
+				.then() //? you are supposed to console.log the result, but no we ain't
+				.catch((err) => console.log(err));
+		}
 	}
 
 	//? Pulls all data from the database
