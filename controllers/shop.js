@@ -60,24 +60,27 @@ exports.getCart = (req, res) => {
 				pageTitle: 'Your Cart',
 				cartItems: cartItemsArray,
 			});
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
 		});
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
-	// let fetchedCart;
-	// let cartItemUnits = 1;
 	Product.findOne(productoId)
 		.then((product) => {
 			return req.user.addToCart(product);
 		})
-		.then((result) => {
-			console.log(result);
-			res.redirect('/cart');
+		.then(() => {
+			// res.redirect('/cart');
+			res.redirect('/');
 		})
-		.catch((err) => {
-			console.log(err);
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
 		});
 };
 
