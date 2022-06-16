@@ -8,7 +8,8 @@ class Product {
 		price,
 		description,
 		imageUrl,
-		id
+		id,
+		userId
 	) {
 		// this.id = id;
 		this.title = title;
@@ -16,6 +17,7 @@ class Product {
 		this.description = description;
 		this.imageUrl = imageUrl;
 		this._id = id ? new mongoDB.ObjectId(id) : null;
+		this.userId = userId;
 	}
 
 	//? Save the current class instance to the database

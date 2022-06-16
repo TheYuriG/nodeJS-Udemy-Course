@@ -32,11 +32,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
 	//? Here we manually created the user on Mongo Compass and then fetched its
 	//? data and hardcoded into this class method
-	User.findById('62a9906875a379ee5e7ffe2e')
-		.then((user) => {
-			req.user = user;
-		})
-		.then((e) => console.log(e));
+	User.findById('62a9906875a379ee5e7ffe2e').then((user) => {
+		req.user = user;
+	});
 	next();
 });
 
@@ -50,7 +48,6 @@ mongoDB.mongoConnect(() => {
 	//? Sets up which port this website will be displayed to on localhost
 	//? if the database fully connects as it should
 	app.listen(3000, () => {
-		// User.findById('62a9906875a379ee5e7ffe2e');
 		console.log('Server listening on port 3000');
 	});
 });
