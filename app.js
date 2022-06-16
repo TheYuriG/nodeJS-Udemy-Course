@@ -33,9 +33,9 @@ app.use((req, res, next) => {
 	//? Here we manually created the user on Mongo Compass and then fetched its
 	//? data and hardcoded into this class method
 	User.findById('62a9906875a379ee5e7ffe2e').then((user) => {
-		req.user = new User(user.email, user.name, user.password, user.cart, user._id);
+		req.user = new User(user.email, user.username, user.password, user.cart, user._id);
+		next();
 	});
-	next();
 });
 
 //? Only start the routes after the bodyparser has been made available and
