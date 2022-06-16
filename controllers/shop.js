@@ -49,12 +49,12 @@ exports.getIndex = (req, res) => {
 
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
-	//? Then pull the products from the cart
-	User.getCart(req.user._id)
-		.getProducts()
+	req.user
+		.getCart()
 		.then((cartItemsArray) => {
 			//? Then render the cart page with whatever content
 			//? there is in the cart or just an empty cart
+			// console.log(cartItemsArray);
 			res.render('shop/cart', {
 				path: '/cart',
 				pageTitle: 'Your Cart',
@@ -75,8 +75,7 @@ exports.postCart = (req, res) => {
 			return req.user.addToCart(product);
 		})
 		.then(() => {
-			// res.redirect('/cart');
-			res.redirect('/');
+			res.redirect('/cart');
 		})
 		.catch((e) => {
 			console.log(e);

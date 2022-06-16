@@ -18,7 +18,10 @@ class User {
 	}
 
 	static findById(userID) {
+		//? Connects to the database
 		const db = getDB();
+
+		//? Finds the user with the given ID
 		return db.collection('users').findOne({ _id: new mongoDB.ObjectId(userID) });
 	}
 
@@ -49,6 +52,40 @@ class User {
 			.updateOne({ _id: new mongoDB.ObjectId(this._id) }, { $set: { cart: this.cart } })
 			.then()
 			.catch((err) => console.log(err));
+	}
+
+	getCart() {
+		//? Connects to the database
+		const db = getDB();
+
+		//? Creates an array with all the products ID, so those can be used
+		//? later to retrieve each individual product
+		const productsArray = this.cart.items.map((i) => i.productId);
+		// console.log(productsArray);
+		return (
+			db
+				.collection('products')
+				//? Search through the database with the IDs in the productsArray
+				.find({ _id: { $in: productsArray } })
+				.toArray() //? The database returns a pointer to each product
+				//? which we then convert to an array
+				.then((arrayOfProducts) => {
+					// console.log(arrayOfProducts);
+					//? Then we attach the quantity to each product
+					return arrayOfProducts.map((product) => {
+						//? Cycle through this copied cart for each product,
+						//? match each product from the database to the product
+						//? from the cart and attach the quantity to the cart product
+						for (let i = 0; i < this.cart.items.length; i++) {
+							if (this.cart.items[i].productId.toString() === product._id.toString()) {
+								//? If the product ID matches the ID in the cart
+								//? attach the quantity to the product
+								return { ...product, quantity: this.cart.items[i].quantity };
+							}
+						}
+					});
+				})
+		);
 	}
 }
 
