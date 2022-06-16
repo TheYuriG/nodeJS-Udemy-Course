@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 
 exports.getProducts = (req, res) => {
 	Product.fetchAll()
@@ -49,23 +50,35 @@ exports.getIndex = (req, res) => {
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
 	//? Then pull the products from the cart
-	cart.getProducts().then((cartItemsArray) => {
-		//? Then render the cart page with whatever content
-		//? there is in the cart or just an empty cart
-		res.render('shop/cart', {
-			path: '/cart',
-			pageTitle: 'Your Cart',
-			cartItems: cartItemsArray,
+	User.getCart(req.user._id)
+		.getProducts()
+		.then((cartItemsArray) => {
+			//? Then render the cart page with whatever content
+			//? there is in the cart or just an empty cart
+			res.render('shop/cart', {
+				path: '/cart',
+				pageTitle: 'Your Cart',
+				cartItems: cartItemsArray,
+			});
 		});
-	});
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
-	let fetchedCart;
-	let cartItemUnits = 1;
-	res.redirect('/cart');
+	// let fetchedCart;
+	// let cartItemUnits = 1;
+	Product.findOne(productoId)
+		.then((product) => {
+			return req.user.addToCart(product);
+		})
+		.then((result) => {
+			console.log(result);
+			res.redirect('/cart');
+		})
+		.catch((err) => {
+			console.log(err);
+		});
 };
 
 //? Handles the POST request when clicking the "Delete" in /cart
