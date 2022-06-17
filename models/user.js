@@ -99,19 +99,28 @@ class User {
 			.catch((err) => console.log(err));
 	}
 
-	turnCartIntoOrder() {
+	turnCartIntoOrder(fullyPopulatedCart) {
 		const db = getDB();
 		return db
 			.collection('orders')
-			.insertOne(this.cart)
+			.insertOne({ userID: this._id, cart: fullyPopulatedCart })
 			.then(() => {
 				this.cart = { items: [] };
 				return db
 					.collection('users')
-					.updateOne({ _id: new mongoDB.ObjectId(this._id) }, { $set: { cart: this.cart } })
-					.then()
-					.catch((err) => console.log(err));
-			});
+					.updateOne({ _id: new mongoDB.ObjectId(this._id) }, { $set: { cart: this.cart } });
+			})
+			.catch((err) => console.log(err));
+	}
+
+	pullOrders() {
+		const db = getDB();
+		return db
+			.collection('orders')
+			.find({ userID: new mongoDB.ObjectId(this._id) })
+			.toArray()
+			.then((orders) => orders)
+			.catch((e) => console.log(e));
 	}
 }
 

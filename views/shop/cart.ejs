@@ -25,6 +25,7 @@
                     <hr>
                     <div class="centered">
                         <form action="/order-this-cart" method="POST">
+                            <input type="hidden" value="<%= JSON.stringify(cartItems) %>" name="cartToOrder">
                             <button type="submit" class="btn">Order Now!</button>
                         </form>
                     </div>

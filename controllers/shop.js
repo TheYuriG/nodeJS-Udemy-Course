@@ -99,17 +99,32 @@ exports.postCartDeletion = (req, res) => {
 
 //? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrders = (req, res) => {
-	res.render('shop/orders', {
-		path: '/orders',
-		pageTitle: 'Your Orders',
-		orders: orderino,
-	});
+	req.user
+		.pullOrders()
+		.then((orderino) => {
+			if (orderino == null) {
+				orderino = [];
+			}
+			res.render('shop/orders', {
+				path: '/orders',
+				pageTitle: 'Your Orders',
+				orders: orderino,
+			});
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 //? Handles the POST request when proceeding to checkout from cart
 exports.postOrders = (req, res) => {
+	//? Parse the order object passed as JSON upon clicking "Order now!" at /cart
+	const parsedOrder = JSON.parse(req.body.cartToOrder);
+
+	//?
 	req.user
-		.turnCartIntoOrder()
+		.turnCartIntoOrder(parsedOrder)
 		.then((order) => {
 			res.redirect('/orders');
 		})
