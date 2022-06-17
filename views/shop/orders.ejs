@@ -1,34 +1,52 @@
 <%- include('../includes/head.ejs') %>
-    </head>
+</head>
 
-    <body>
-        <%- include('../includes/navigation.ejs') %>
-            <main>
-                <% if (orders.length> 0) { let orderNumber = 0 %>
-                    <ul>
-                        <% orders.forEach(item=> { %>
-                            <li>
-                                <h1>
-                                    Order #<%= ++orderNumber %>
-                                </h1>
-                                <ul>
-                                    <% item.cart.forEach(product=> { %>
-                                        <li>
-                                            <%= product.title %> (<%= product.quantity %>)
-                                        </li>
-                                        <% }) %>
-                                </ul>
-                            </li>
-                            <% }) %>
-                    </ul>
-                    <hr>
-                    <div class="centered">
-                        <form action="/order-this-cart" method="POST">
-                            <button type="submit" class="btn">Order Now!</button>
-                        </form>
-                    </div>
-                    <% } else { %>
-                        <h1>Nothing there!</h1>
-                        <% } %>
-            </main>
-            <%- include('../includes/end.ejs') %>
+<body>
+  <%- include('../includes/navigation.ejs') %>
+  <main>
+    <%# Check if the orders actually have any content %>
+    <% if (orders.length> 0) { %>
+    <%# If so, cycle through the orders matrix %>
+    <% let orderNumber = 0 %>
+    <%# orderNumber is the variable that tracks the number of the orders being displayed on
+    screen %>
+    <% let orderHistoryPrice = 0 %>
+    <ul>
+      <% orders.forEach(item=> { %>
+      <li>
+        <h2>
+          Order #<%= ++orderNumber %>
+        </h2>
+        <ul>
+          <% let currentOrderPrice = 0 %>
+          <% item.cart.forEach(product=> { %>
+          <%# Inside the orders matrix, cycle through the products of each
+          order %>
+          <li>
+            <%= product.title %> (<%= product.quantity %>x R$<%= product.price %>)
+          </li>
+          <%# Add the price of each product to the orderHistoryPrice variable %>
+          <% orderHistoryPrice += +product.price %>
+          <% currentOrderPrice += +product.price %>
+          <% }) %>
+        </ul>
+        <h5>Total cost of this order: R$ <%= currentOrderPrice %> </h5>
+        <hr>
+      </li>
+      <% }) %>
+    </ul>
+    <h3>Total cost of all orders combined: R$ <%= orderHistoryPrice %></h3>
+    <h4>Thank you for shopping with us, hope to see you again in the future!</h4>
+    <% if (false) { %>
+    <%# This is a placeholder for a future button, if there is one %>
+    <div class="centered">
+      <form action="/order-this-cart" method="POST">
+        <button type="submit" class="btn">Order Now!</button>
+      </form>
+    </div>
+    <% } %>
+    <% } else { %>
+    <h1>Nothing there!</h1>
+    <% } %>
+  </main>
+  <%- include('../includes/end.ejs') %>
