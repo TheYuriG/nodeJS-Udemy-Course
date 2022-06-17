@@ -122,10 +122,17 @@ exports.postOrders = (req, res) => {
 	//? Parse the order object passed as JSON upon clicking "Order now!" at /cart
 	const parsedOrder = JSON.parse(req.body.cartToOrder);
 
-	//?
+	//? Pass the parsedOrder into the User model to save the order related
+	//? to this cart, since the current price being paid is important in case
+	//? the cost of this item is changed in the database in the future.
+	//? This is how a real-world application would behave, since the price
+	//? of the item can change, but won't affect how much you actually paid
+	//? for it at the moment you completed your transaction.
 	req.user
 		.turnCartIntoOrder(parsedOrder)
 		.then((order) => {
+			//? Once you finish processing and storing this current order,
+			//? redirect the user to the orders page and display the orders
 			res.redirect('/orders');
 		})
 		.catch((e) => {

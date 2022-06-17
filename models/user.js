@@ -87,6 +87,8 @@ class User {
 		);
 	}
 
+	//? Processes the removal of one item from the cart when the user
+	//? clicks the "Yeet this item" button
 	removeFromCart(productId) {
 		const db = getDB();
 		//? Find the product in the cart
@@ -99,12 +101,22 @@ class User {
 			.catch((err) => console.log(err));
 	}
 
+	//? This is the function that processes the "Order now!" button at the cart
 	turnCartIntoOrder(fullyPopulatedCart) {
+		//? Connect to the database first
 		const db = getDB();
+
+		//? Save to the database the order that is being completed from
+		//? the current cart. This is important because the price at the moment
+		//? of purchase is what matters for us, since it won't matter if the
+		//? item has its price changed in the future. The user paid what they paid
 		return db
 			.collection('orders')
 			.insertOne({ userID: this._id, cart: fullyPopulatedCart })
 			.then(() => {
+				//? After you save this order in the database,
+				//? empty this user's cart and save that information to
+				//? the database
 				this.cart = { items: [] };
 				return db
 					.collection('users')
@@ -113,14 +125,23 @@ class User {
 			.catch((err) => console.log(err));
 	}
 
+	//? Process and return the orders data when the user tries to access the
+	//? orders page
 	pullOrders() {
+		//? Connect to the database first
 		const db = getDB();
-		return db
-			.collection('orders')
-			.find({ userID: new mongoDB.ObjectId(this._id) })
-			.toArray()
-			.then((orders) => orders)
-			.catch((e) => console.log(e));
+
+		//? Find all the orders that belong to the user
+		return (
+			db
+				.collection('orders')
+				.find({ userID: new mongoDB.ObjectId(this._id) })
+				.toArray() //? The database returns a pointer to each order,
+				//? so we need to turn the pointers into an array
+				.then((orders) => orders) //? Return the matrix of orders
+				//? with array of purchased items
+				.catch((e) => console.log(e))
+		);
 	}
 }
 
