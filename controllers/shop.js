@@ -89,7 +89,12 @@ exports.postCartDeletion = (req, res) => {
 	const productoId = req.body.idOfItemToBeDeleted;
 	//? After the cartItem product instance, redirect the user to the cart
 	//? page and display any remaining items in it, if any
-	res.redirect('/cart');
+	req.user
+		.removeFromCart(productoId)
+		.then(() => {
+			res.redirect('/cart');
+		})
+		.catch((error) => console.log(error));
 };
 
 //? Pulls the Order data and then pass it into the view to be rendered properly
