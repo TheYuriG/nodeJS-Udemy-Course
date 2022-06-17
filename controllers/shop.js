@@ -108,7 +108,15 @@ exports.getOrders = (req, res) => {
 
 //? Handles the POST request when proceeding to checkout from cart
 exports.postOrders = (req, res) => {
-	res.redirect('/orders');
+	req.user
+		.turnCartIntoOrder()
+		.then((order) => {
+			res.redirect('/orders');
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 exports.getCheckout = (req, res) => {

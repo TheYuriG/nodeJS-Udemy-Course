@@ -98,6 +98,21 @@ class User {
 			.then()
 			.catch((err) => console.log(err));
 	}
+
+	turnCartIntoOrder() {
+		const db = getDB();
+		return db
+			.collection('orders')
+			.insertOne(this.cart)
+			.then(() => {
+				this.cart = { items: [] };
+				return db
+					.collection('users')
+					.updateOne({ _id: new mongoDB.ObjectId(this._id) }, { $set: { cart: this.cart } })
+					.then()
+					.catch((err) => console.log(err));
+			});
+	}
 }
 
 module.exports = User;
