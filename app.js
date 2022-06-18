@@ -19,7 +19,7 @@ app.set('views', 'views');
 //? Separates the routes for shop and admin-related pages
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const User = require('./models/user');
+// const User = require('./models/user');
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,14 +29,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 //? This is a middleware to attach user data to the request object, so all
 //? requests possess this data and then you can proceed creating carts and
 //? orders with this user
-app.use((req, res, next) => {
-	//? Here we manually created the user on Mongo Compass and then fetched its
-	//? data and hardcoded into this class method
-	User.findById('62a9906875a379ee5e7ffe2e').then((user) => {
-		req.user = new User(user.email, user.username, user.password, user.cart, user._id);
-		next();
-	});
-});
+// app.use((req, res, next) => {
+// 	//? Here we manually created the user on Mongo Compass and then fetched its
+// 	//? data and hardcoded into this class method
+// 	User.findById('62a9906875a379ee5e7ffe2e').then((user) => {
+// 		req.user = new User(user.email, user.username, user.password, user.cart, user._id);
+// 		next();
+// 	});
+// });
 
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public

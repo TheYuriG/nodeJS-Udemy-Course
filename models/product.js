@@ -1,4 +1,11 @@
-const mongoDB = require('mongodb');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const schemaForProducts = new Schema({
+	title: { type: String, required: true },
+	price: { type: Number, required: true },
+	image: { type: String, required: true },
+	description: { type: String, required: true },
+});
 
 class Product {
 	constructor(
@@ -83,4 +90,4 @@ class Product {
 	}
 }
 
-module.exports = Product;
+module.exports = mongoose.model('Product', schemaForProducts);
