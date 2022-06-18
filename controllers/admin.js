@@ -38,7 +38,7 @@ exports.getEditProduct = (req, res) => {
 
 	//? Checks for the product ID in the request parameters (the second / in the URL)
 	const prodId = req.params.productId;
-	Product.findOne(prodId)
+	Product.findById(prodId)
 		.then((product) => {
 			//? If the item can't be found, redirect to the main page
 			//? This should never happen unless the user is manually trying to access
