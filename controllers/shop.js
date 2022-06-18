@@ -18,7 +18,7 @@ exports.getProducts = (req, res) => {
 
 //? Controller for individual item details
 exports.getProductDetail = (req, res) => {
-	Product.findOne(req.params.productId)
+	Product.findById(req.params.productId)
 		.then((product) => {
 			res.render('shop/product-detail', {
 				product: product,
