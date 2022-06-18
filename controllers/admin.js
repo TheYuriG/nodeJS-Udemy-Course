@@ -104,7 +104,7 @@ exports.deleteProduct = (req, res) => {
 //? Loads the page to view all products in admin mode (with edit) only for
 //? the user currently logged in (userId == 1)
 exports.getProducts = (req, res) => {
-	Product.fetchAll()
+	Product.find()
 		.then((products) => {
 			res.render('admin/products', {
 				prods: products,
