@@ -70,6 +70,46 @@ class User {
 				.toArray() //? The database returns a pointer to each product
 				//? which we then convert to an array
 				.then((arrayOfProducts) => {
+					//? Checks if this operation returned as many items as there
+					//? were in the cart. If not, that means that some of the products
+					//? were deleted from the database, so we need to remove them from
+					//? the cart.
+					if (this.cart.items.length != arrayOfProducts.length) {
+						//? If the lenght of the cart is not equal to the length of the
+						//? array of products, then some of the products were deleted
+						//? and we need to fix that now.
+						console.log(
+							'Cart data mismatch! Some items were deleted from database, but not from the cart. Now removing deleted products from cart...'
+						);
+
+						//? Creates a new array that will store only the cart items that
+						//? are still in the database
+						let newFilteredArray = [];
+
+						//? Cycle through the cart items and check if the product is
+						//? still in the database. If so, add it to the new array.
+						this.cart.items.forEach((item) => {
+							if (
+								arrayOfProducts.find((product) => product._id.toString() === item.productId.toString())
+							) {
+								newFilteredArray.push(item);
+							}
+						});
+
+						//? Update the cart in the database containing only the products
+						//? that are still in the database. After finishing, log the success
+						//? or failure of the operation.
+						db.collection('users')
+							.updateOne(
+								{ _id: new mongoDB.ObjectId(this._id) },
+								{ $set: { cart: { items: newFilteredArray } } }
+							)
+							.then(() => {
+								console.log('Cart data mismatch fixed.');
+							})
+							.catch(() => console.log('Error fixing cart data mismatch.'));
+					}
+
 					//? Then we attach the quantity to each product
 					return arrayOfProducts.map((product) => {
 						//? Cycle through this copied cart for each product,
