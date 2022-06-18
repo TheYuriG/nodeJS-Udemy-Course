@@ -4,10 +4,10 @@ const path = require('path');
 //? NPM imports
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 //? Project imports
 const errorController = require('./controllers/error');
-const mongoDB = require('./util/base-of-data');
 
 //? Starts express
 const app = express();
@@ -44,10 +44,17 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(errorController.get404);
 
-mongoDB.mongoConnect(() => {
-	//? Sets up which port this website will be displayed to on localhost
-	//? if the database fully connects as it should
-	app.listen(3000, () => {
-		console.log('Server listening on port 3000');
+mongoose
+	.connect(
+		'mongodb+srv://NodeJS-course:tozY1rQ8LktyZETy@nodejs-tutorial.nsxgg.mongodb.net/shop?retryWrites=true&w=majority'
+	)
+	.then(() => {
+		//? Sets up which port this website will be displayed to on localhost
+		//? if the database fully connects as it should
+		app.listen(3000, () => {
+			console.log('Server listening on port 3000');
+		});
+	})
+	.catch((err) => {
+		console.log(err);
 	});
-});
