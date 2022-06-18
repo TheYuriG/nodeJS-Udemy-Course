@@ -72,13 +72,25 @@ exports.getEditProduct = (req, res) => {
 
 // ? Processes the data request of adding a product
 exports.postEditProduct = (req, res) => {
+	//? Pull all the sent data from the request body
 	const id = req.body.id;
 	let title = req.body.title;
 	let imageUrl = req.body.imageUrl;
 	let price = req.body.price;
 	let description = req.body.description;
-	let productino = new Product(title, price, description, imageUrl, id)
-		.save()
+
+	//? Look up the old data of this product in the database
+	Product.findById(id)
+		.then((product) => {
+			//? Manually update the data of the product
+			product.title = title;
+			product.price = price;
+			product.description = description;
+			product.imageUrl = imageUrl;
+
+			//? Save the updated product to the database
+			return product.save();
+		})
 		.then(() => {
 			console.log('product updated successfully!');
 			res.redirect('/admin/products');
