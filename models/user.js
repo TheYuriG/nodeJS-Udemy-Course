@@ -1,5 +1,4 @@
 const mongoDB = require('mongodb');
-const { getDB } = require('../util/base-of-data');
 
 class User {
 	constructor(email, username, password, cart, id) {
