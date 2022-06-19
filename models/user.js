@@ -53,5 +53,26 @@ schemaForUsers.methods.getCart = function () {
 	return this.cart.populate('items.productId');
 };
 
+//? Adds a custom method to remove a product from the cart
+schemaForUsers.methods.removeFromCart = function (productId) {
+	//? Find the product in the cart
+	const cartProductIndex = this.cart.items.findIndex(
+		(cartProduct) => cartProduct.productId.toString() === productId.toString()
+	);
+
+	//? If the product is in the cart, remove it
+	if (cartProductIndex >= 0) {
+		this.cart.items.splice(cartProductIndex, 1);
+	}
+
+	//? If the product is not in the cart, do nothing
+	else {
+		console.log('This product is not in your cart');
+	}
+
+	//? Update the cart of the user
+	return this.save();
+};
+
 //? Export the user model to be used in the app
 module.exports = mongoose.model('User', schemaForUsers);
