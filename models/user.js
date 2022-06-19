@@ -1,5 +1,6 @@
 //? Require mongoose to setup the document schema
 const mongoose = require('mongoose');
+const product = require('./product');
 const Schema = mongoose.Schema;
 
 //? Create a new schema for how an User is defined
@@ -19,6 +20,38 @@ const schemaForUsers = new Schema({
 		],
 	},
 });
+
+//? Add our own custom methods to the mongoose schema
+schemaForUsers.methods.addToCart = function (product) {
+	//? Look through the cart items to see if the product is already in the cart
+	const cartProductIndex = this.cart.items.findIndex(
+		(cartProduct) => cartProduct.productId.toString() === product._id.toString()
+	);
+
+	//? If the product is already in the cart, increase the quantity
+	if (cartProductIndex >= 0) {
+		this.cart.items[cartProductIndex].quantity++;
+	}
+	//? If the product is not in the cart, add it to the cart
+	else {
+		this.cart.items.push({
+			productId: product._id,
+			quantity: 1,
+		});
+	}
+
+	//? Update the cart of the user
+	return this.save();
+};
+
+//? Add custom method to retrieving user cart items
+schemaForUsers.methods.getCart = function () {
+	//? Return the cart of the user already populated by productId data
+	//! Note that this won't replace productId with the product data, but
+	//! rather, it will nest the data inside productId. This is
+	//! addressed inside the EJS templating files
+	return this.cart.populate('items.productId');
+};
 
 //? Export the user model to be used in the app
 module.exports = mongoose.model('User', schemaForUsers);
