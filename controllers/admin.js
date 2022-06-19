@@ -123,6 +123,17 @@ exports.deleteProduct = (req, res) => {
 //? the user currently logged in (userId == 1)
 exports.getProducts = (req, res) => {
 	Product.find()
+		//? Mongoose has helper functions that enable you to filter in and out
+		//? some specific data
+		// .select('title price -_id')
+		//? SELECT filters to only return the title and price of the product, while
+		//? forcefully removing the ID which would always be returned otherwise
+		// .populate('userId', 'name')
+		//? Assuming you have declared a relational schema in the model,
+		//? POPULATE will add that very same data to the product object
+		//? that is going to be returned by this method.
+		//? I would assume the class creator will be using this when
+		//? We readd the orders page
 		.then((products) => {
 			res.render('admin/products', {
 				prods: products,
