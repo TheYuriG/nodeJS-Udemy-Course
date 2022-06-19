@@ -8,6 +8,8 @@ const schemaForProducts = new Schema({
 	price: { type: Number, required: true }, //? All products need a price
 	imageUrl: { type: String, required: true }, //? All products need an image
 	description: { type: String, required: true }, //? All products need a description
+	userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, //? All products need a
+	//? userId that created them. We also need to link the userId to the User model
 });
 
 //? Export the user model to be used in the controllers
