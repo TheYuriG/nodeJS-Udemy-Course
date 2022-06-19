@@ -131,9 +131,12 @@ exports.getProducts = (req, res) => {
 		// .populate('userId', 'name')
 		//? Assuming you have declared a relational schema in the model,
 		//? POPULATE will add that very same data to the product object
-		//? that is going to be returned by this method.
+		//? that is going to be returned by this method. The first argument
+		//? will point what schema reference will be pulled from another
+		//? database and the second argument will be the name of the property
+		//? that you want to be pulled and added to this retrieved product.
 		//? I would assume the class creator will be using this when
-		//? We readd the orders page
+		//? we readd the orders page
 		.then((products) => {
 			res.render('admin/products', {
 				prods: products,
