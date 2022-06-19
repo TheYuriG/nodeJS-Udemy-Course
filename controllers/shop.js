@@ -1,5 +1,5 @@
 const Product = require('../models/product');
-const User = require('../models/user');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res) => {
 	Product.find()
@@ -102,16 +102,15 @@ exports.postCartDeletion = (req, res) => {
 
 //? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrders = (req, res) => {
-	req.user
-		.pullOrders()
+	//? Search through all orders and retrieve the ones that
+	//? has userId === this user's ID
+	Order.find({ userId: req.user._id })
 		.then((orderino) => {
-			if (orderino == null) {
-				orderino = [];
-			}
+			//? Render the orders page considering the found orders, if any
 			res.render('shop/orders', {
 				path: '/orders',
 				pageTitle: 'Your Orders',
-				orders: orderino,
+				orders: orderino == null ? [] : orderino, //? Gives back an empty array if no orders were found
 			});
 		})
 		.catch((e) => {
@@ -123,7 +122,22 @@ exports.getOrders = (req, res) => {
 //? Handles the POST request when proceeding to checkout from cart
 exports.postOrders = (req, res) => {
 	//? Parse the order object passed as JSON upon clicking "Order now!" at /cart
-	const parsedOrder = JSON.parse(req.body.cartToOrder);
+	let parsedOrder = JSON.parse(req.body.cartToOrder);
+
+	//? Fix the data from the JSON in order to be able to save it
+	//? in the orders database, else the validator will fail
+	parsedOrder = parsedOrder.map((orderItem) => {
+		let itemObject = {};
+		itemObject.productId = orderItem.productId._id;
+		itemObject.title = orderItem.productId.title;
+		itemObject.imageUrl = orderItem.productId.imageUrl;
+		itemObject.price = orderItem.productId.price;
+		itemObject.description = orderItem.productId.description;
+		itemObject.quantity = orderItem.quantity;
+		itemObject.userId = req.user._id;
+		return itemObject;
+	});
+	// console.log(parsedOrder);
 
 	//? Pass the parsedOrder into the User model to save the order related
 	//? to this cart, since the current price being paid is important in case
@@ -131,12 +145,18 @@ exports.postOrders = (req, res) => {
 	//? This is how a real-world application would behave, since the price
 	//? of the item can change, but won't affect how much you actually paid
 	//? for it at the moment you completed your transaction.
-	req.user
-		.turnCartIntoOrder(parsedOrder)
+	const order = new Order({ userId: req.user._id, items: parsedOrder });
+	order
+		.save()
 		.then((order) => {
-			//? Once you finish processing and storing this current order,
-			//? redirect the user to the orders page and display the orders
-			res.redirect('/orders');
+			// console.log('user order stored successfully. now emptying user cart');
+			req.user.cart.items = [];
+			return req.user.save().then((success) => {
+				// console.log('user cart emptied and stored successfully');
+				//? Once you finish processing and storing this current order,
+				//? redirect the user to the orders page and display the orders
+				res.redirect('/orders');
+			});
 		})
 		.catch((e) => {
 			console.log(e);
