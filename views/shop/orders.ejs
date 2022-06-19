@@ -26,8 +26,8 @@
             <%= product.title %> (<%= product.quantity %>x R$<%= product.price %>)
           </li>
           <%# Add the price of each product to the orderHistoryPrice variable %>
-          <% orderHistoryPrice += +product.price %>
-          <% currentOrderPrice += +product.price %>
+          <% orderHistoryPrice += +product.price * product.quantity %>
+          <% currentOrderPrice += +product.price * product.quantity %>
           <% }) %>
         </ul>
         <h5>Total cost of this order: R$ <%= currentOrderPrice %> </h5>
