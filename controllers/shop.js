@@ -54,11 +54,14 @@ exports.getCart = (req, res) => {
 		.then((cartItemsArray) => {
 			//? Then render the cart page with whatever content
 			//? there is in the cart or just an empty cart
-			// console.log(cartItemsArray);
+			// console.log(cartItemsArray.items);
+			//! Since the productId gets nested-populated by the .populate()
+			//! method in mongoose, we need to travel inside of that when
+			//! calling the res.render()
 			res.render('shop/cart', {
 				path: '/cart',
 				pageTitle: 'Your Cart',
-				cartItems: cartItemsArray,
+				cartItems: cartItemsArray.items,
 			});
 		})
 		.catch((e) => {
@@ -70,7 +73,7 @@ exports.getCart = (req, res) => {
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
-	Product.findOne(productoId)
+	Product.findById(productoId)
 		.then((product) => {
 			return req.user.addToCart(product);
 		})
