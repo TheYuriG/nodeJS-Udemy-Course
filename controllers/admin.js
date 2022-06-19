@@ -104,7 +104,7 @@ exports.postEditProduct = (req, res) => {
 exports.deleteProduct = (req, res) => {
 	//? Gets the ID of the item to be deleted through the POST request
 	const deletionID = req.params.productId;
-	Product.deleteById(deletionID)
+	Product.findByIdAndRemove(deletionID)
 		.then(() => {
 			//? Redirects (reloads) back to the same /admin/products page which will
 			//? now be missing the item you have just requested to delete
