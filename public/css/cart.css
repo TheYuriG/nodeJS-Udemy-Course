@@ -22,3 +22,21 @@
 	font-size: 1.2rem;
 	margin: 0;
 }
+
+.deletionButton {
+	display: inline-block;
+	padding: 0.25rem 1rem;
+	text-decoration: none;
+	font: inherit;
+	border: 1px solid red;
+	color: red;
+	background: white;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.deletionButton:hover,
+.deletionButton:active {
+	background-color: red;
+	color: white;
+}

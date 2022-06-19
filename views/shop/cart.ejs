@@ -23,7 +23,7 @@
         <form action="/cart-delete-item" method="POST">
           <input type="hidden" value="<%= item.productId._id %>" name="idOfItemToBeDeleted">
           <%# make sure to pull the proper _id inside productId %>
-          <button class="btn" type="submit">Yeet this item</button>
+          <button class="deletionButton" type="submit">Yeet this item</button>
         </form>
       </li>
       <% }) %>
