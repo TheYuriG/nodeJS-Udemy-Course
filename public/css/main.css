@@ -197,9 +197,20 @@ form {
 	color: white;
 }
 
+.main-header__item-list {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+}
+
 @media (min-width: 768px) {
 	.main-header__nav {
+		height: 100%;
+		width: 100%;
 		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	#side-menu-toggle {

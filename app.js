@@ -19,6 +19,7 @@ app.set('views', 'views');
 //? Separates the routes for shop and admin-related pages
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authenticationRoutes = require('./routes/auth');
 const User = require('./models/user');
 
 //? Automatically parses body messages, so other commands can use req.body
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 //? the CSS files are made public
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authenticationRoutes);
 app.use(errorController.get404);
 
 mongoose
