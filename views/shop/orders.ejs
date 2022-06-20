@@ -5,7 +5,7 @@
   <%- include('../includes/navigation.ejs') %>
   <main>
     <%# Check if the orders actually have any content %>
-    <% if (orders.length> 0) { %>
+    <% if (isAuthenticated && orders.length> 0) { %>
     <%# If so, cycle through the orders matrix %>
     <% let orderNumber = 0 %>
     <%# orderNumber is the variable that tracks the number of the orders being displayed on

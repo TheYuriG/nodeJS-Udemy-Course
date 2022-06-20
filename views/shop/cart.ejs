@@ -5,7 +5,7 @@
 <body>
   <%- include('../includes/navigation.ejs') %>
   <main>
-    <% if (cartItems.length> 0) { %>
+    <% if (isAuthenticated && cartItems.length> 0) { %>
     <%# cycle through every item in the user's cart.items array %>
     <ul>
       <% cartItems.forEach(item=> { %>

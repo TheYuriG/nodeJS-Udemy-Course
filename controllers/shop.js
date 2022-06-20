@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
+const User = require('../models/user');
 
 exports.getProducts = (req, res) => {
 	Product.find()
@@ -55,27 +56,31 @@ exports.getIndex = (req, res) => {
 
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
-	req.session.user
-		.getCart()
-		.then((cartItemsArray) => {
-			//? Then render the cart page with whatever content
-			//? there is in the cart or just an empty cart
-			// console.log(cartItemsArray.items);
-			//! Since the productId gets nested-populated by the .populate()
-			//! method in mongoose, we need to travel inside of that when
-			//! calling the res.render()
-			const loginData = req.session.isAuthenticated ? true : false;
-			res.render('shop/cart', {
-				path: '/cart',
-				pageTitle: 'Your Cart',
-				cartItems: cartItemsArray.items,
-				isAuthenticated: loginData,
+	if (req.session.user) {
+		User.findById(req.session.user._id)
+			.then((user) => {
+				user.getCart().then((cartItemsArray) => {
+					//? Then render the cart page with whatever content
+					//? there is in the cart or just an empty cart
+					//! Since the productId gets nested-populated by the .populate()
+					//! method in mongoose, we need to travel inside of that when
+					//! calling the res.render()
+					const loginData = req.session.isAuthenticated ? true : false;
+					res.render('shop/cart', {
+						path: '/cart',
+						pageTitle: 'Your Cart',
+						cartItems: cartItemsArray.items,
+						isAuthenticated: loginData,
+					});
+				});
+			})
+			.catch((e) => {
+				console.log(e);
+				res.redirect('/404');
 			});
-		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
-		});
+	} else {
+		res.redirect('/');
+	}
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
@@ -83,7 +88,7 @@ exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
 	Product.findById(productoId)
 		.then((product) => {
-			return req.session.user.addToCart(product);
+			return User.findById(req.session.user._id).then((user) => user.addToCart(product));
 		})
 		.then(() => {
 			res.redirect('/cart');

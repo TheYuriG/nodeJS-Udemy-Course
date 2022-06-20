@@ -13,6 +13,6 @@ exports.postLogin = (req, res, next) => {
 	req.session.isAuthenticated = true;
 	User.findById('62ae6c054ccbec553949b3d7').then((user) => {
 		req.session.user = user;
+		res.redirect('/');
 	});
-	res.redirect('/');
 };
