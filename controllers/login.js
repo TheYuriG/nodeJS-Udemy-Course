@@ -1,5 +1,7 @@
+const User = require('../models/user');
+
 exports.getLogin = (req, res, next) => {
-	const loginData = req.get('Cookie').includes('completedAuthentication=true');
+	const loginData = req.session.isAuthenticated ? true : false;
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
@@ -8,10 +10,9 @@ exports.getLogin = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-	//? First piece of data is the parameters and values of this cookie.
-	//? Second piece is how long this cookie should be usable before it
-	//? expires. Third piece is restricting this cookie to Http requests,
-	//? as that protects from injection attacks (more secure)
-	res.setHeader('Set-Cookie', 'completedAuthentication=true; Max-Age=604800; HttpOnly');
+	req.session.isAuthenticated = true;
+	User.findById('62ae6c054ccbec553949b3d7').then((user) => {
+		req.session.user = user;
+	});
 	res.redirect('/');
 };

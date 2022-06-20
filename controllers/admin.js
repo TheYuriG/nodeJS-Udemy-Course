@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 //? Loads the blank page to add a new product rather than editing an old one
 exports.getAddProduct = (req, res) => {
-	const loginData = req.get('Cookie').includes('completedAuthentication=true');
+	const loginData = req.session.isAuthenticated ? true : false;
 	res.render('admin/edit-product', {
 		pageTitle: 'Add Product',
 		path: '/admin/add-product',
@@ -23,7 +23,7 @@ exports.postAddProduct = (req, res) => {
 		price: price,
 		description: description,
 		imageUrl: imageUrl,
-		userId: req.user._id,
+		userId: req.session.user._id,
 	});
 	product
 		.save()
@@ -65,7 +65,7 @@ exports.getEditProduct = (req, res) => {
 			//! I did differently so I'm actually learning instead of
 			//! following tutorials blindly
 			req.query.id = prodId;
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('admin/edit-product', {
 				pageTitle: 'Edit Product',
 				path: '/admin/edit-product',
@@ -142,7 +142,7 @@ exports.getProducts = (req, res) => {
 		//? I would assume the class creator will be using this when
 		//? we readd the orders page
 		.then((products) => {
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('admin/products', {
 				prods: products,
 				pageTitle: 'Admin Products',

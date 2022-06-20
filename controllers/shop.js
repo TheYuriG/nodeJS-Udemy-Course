@@ -4,7 +4,7 @@ const Order = require('../models/order');
 exports.getProducts = (req, res) => {
 	Product.find()
 		.then((products) => {
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('shop/product-list', {
 				pageTitle: 'All Products',
 				path: '/products',
@@ -22,7 +22,7 @@ exports.getProducts = (req, res) => {
 exports.getProductDetail = (req, res) => {
 	Product.findById(req.params.productId)
 		.then((product) => {
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('shop/product-detail', {
 				product: product,
 				pageTitle: product.title,
@@ -39,7 +39,7 @@ exports.getProductDetail = (req, res) => {
 exports.getIndex = (req, res) => {
 	Product.find()
 		.then((products) => {
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('shop/index', {
 				prods: products,
 				pageTitle: 'Shop',
@@ -55,7 +55,7 @@ exports.getIndex = (req, res) => {
 
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
-	req.user
+	req.session.user
 		.getCart()
 		.then((cartItemsArray) => {
 			//? Then render the cart page with whatever content
@@ -64,7 +64,7 @@ exports.getCart = (req, res) => {
 			//! Since the productId gets nested-populated by the .populate()
 			//! method in mongoose, we need to travel inside of that when
 			//! calling the res.render()
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('shop/cart', {
 				path: '/cart',
 				pageTitle: 'Your Cart',
@@ -83,7 +83,7 @@ exports.postCart = (req, res) => {
 	const productoId = req.body.producto;
 	Product.findById(productoId)
 		.then((product) => {
-			return req.user.addToCart(product);
+			return req.session.user.addToCart(product);
 		})
 		.then(() => {
 			res.redirect('/cart');
@@ -100,7 +100,7 @@ exports.postCartDeletion = (req, res) => {
 	const productoId = req.body.idOfItemToBeDeleted;
 	//? After the cartItem product instance, redirect the user to the cart
 	//? page and display any remaining items in it, if any
-	req.user
+	req.session.user
 		.removeFromCart(productoId)
 		.then(() => {
 			res.redirect('/cart');
@@ -112,10 +112,10 @@ exports.postCartDeletion = (req, res) => {
 exports.getOrders = (req, res) => {
 	//? Search through all orders and retrieve the ones that
 	//? has userId === this user's ID
-	Order.find({ userId: req.user._id })
+	Order.find({ userId: req.session.user._id })
 		.then((orderino) => {
 			//? Render the orders page considering the found orders, if any
-			const loginData = req.get('Cookie').includes('completedAuthentication=true');
+			const loginData = req.session.isAuthenticated ? true : false;
 			res.render('shop/orders', {
 				path: '/orders',
 				pageTitle: 'Your Orders',
@@ -144,7 +144,7 @@ exports.postOrders = (req, res) => {
 		itemObject.price = orderItem.productId.price;
 		itemObject.description = orderItem.productId.description;
 		itemObject.quantity = orderItem.quantity;
-		itemObject.userId = req.user._id;
+		itemObject.userId = req.session.user._id;
 		return itemObject;
 	});
 	// console.log(parsedOrder);
@@ -155,13 +155,13 @@ exports.postOrders = (req, res) => {
 	//? This is how a real-world application would behave, since the price
 	//? of the item can change, but won't affect how much you actually paid
 	//? for it at the moment you completed your transaction.
-	const order = new Order({ userId: req.user._id, items: parsedOrder });
+	const order = new Order({ userId: req.session.user._id, items: parsedOrder });
 	order
 		.save()
 		.then((order) => {
 			// console.log('user order stored successfully. now emptying user cart');
-			req.user.cart.items = [];
-			return req.user.save().then((success) => {
+			req.session.user.cart.items = [];
+			return req.session.user.save().then((success) => {
 				// console.log('user cart emptied and stored successfully');
 				//? Once you finish processing and storing this current order,
 				//? redirect the user to the orders page and display the orders
@@ -175,7 +175,7 @@ exports.postOrders = (req, res) => {
 };
 
 exports.getCheckout = (req, res) => {
-	const loginData = req.get('Cookie').includes('completedAuthentication=true');
+	const loginData = req.session.isAuthenticated ? true : false;
 	res.render('shop/checkout', {
 		path: '/checkout',
 		pageTitle: 'Checkout',

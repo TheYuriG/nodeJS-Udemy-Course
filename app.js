@@ -5,12 +5,17 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
+const session = require('express-session');
+const MongoSessionStore = require('connect-mongodb-session')(session);
 //? Project imports
 const errorController = require('./controllers/error');
 
+const MONGODB_URI = 'mongodb+srv://NodeJS-course:tozY1rQ8LktyZETy@nodejs-tutorial.nsxgg.mongodb.net/shop?w=majority';
+
 //? Starts express
 const app = express();
+//? Initializes the user session storage
+const sessionStore = new MongoSessionStore({ uri: MONGODB_URI, collection: 'sessions' });
 
 //? Sets up EJS as the view engine and explicitly define the views folder
 app.set('view engine', 'ejs');
@@ -26,18 +31,20 @@ const User = require('./models/user');
 app.use(bodyParser.urlencoded({ extended: false }));
 //? Enables the css folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
-
-//? This is a middleware to attach user data to the request object, so all
-//? requests possess this data and then you can proceed creating carts and
-//? orders with this user
-app.use((req, res, next) => {
-	//? Here we manually created the user on Mongo Compass and then fetched its
-	//? data and hardcoded into this class method
-	User.findById('62ae6c054ccbec553949b3d7').then((user) => {
-		req.user = user;
-		next();
-	});
-});
+//? Adds the middleware for handling user sessions, set up the proper cookie,
+//? reads it when needed and stores it in MongoDB to avoid a memory overflow
+//? that would happen if all sessions were allocated in memory
+app.use(
+	session({
+		secret: 'longestPossibleStringToHashAsIfThisWasProduction',
+		//? "secret" will define your security. The longer this is, the harder it will be to decrypt your session hash
+		resave: false, //? Set the session to not save again unless data was changed
+		saveUninitialized: false, //? Similar to resave, improves performance
+		cookie: { maxAge: 68400000 }, //? Sets the lifetime of the session, in ms
+		store: sessionStore, //? Defines where the session middleware will store
+		//? the sessions, rather than allocating memory for hundreds of concurrent users
+	})
+);
 
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public
@@ -47,9 +54,7 @@ app.use(authenticationRoutes);
 app.use(errorController.get404);
 
 mongoose
-	.connect(
-		'mongodb+srv://NodeJS-course:tozY1rQ8LktyZETy@nodejs-tutorial.nsxgg.mongodb.net/shop?retryWrites=true&w=majority'
-	)
+	.connect(MONGODB_URI)
 	.then(() => {
 		//? Sets up which port this website will be displayed to on localhost
 		//? if the database fully connects as it should
