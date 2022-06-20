@@ -4,10 +4,12 @@ const Order = require('../models/order');
 exports.getProducts = (req, res) => {
 	Product.find()
 		.then((products) => {
+			const loginData = req.get('Cookie').includes('completedAuthentication=true');
 			res.render('shop/product-list', {
 				pageTitle: 'All Products',
 				path: '/products',
 				prods: products,
+				isAuthenticated: loginData,
 			});
 		})
 		.catch((e) => {
@@ -20,10 +22,12 @@ exports.getProducts = (req, res) => {
 exports.getProductDetail = (req, res) => {
 	Product.findById(req.params.productId)
 		.then((product) => {
+			const loginData = req.get('Cookie').includes('completedAuthentication=true');
 			res.render('shop/product-detail', {
 				product: product,
 				pageTitle: product.title,
 				path: '/products',
+				isAuthenticated: loginData,
 			});
 		})
 		.catch((e) => {
@@ -35,10 +39,12 @@ exports.getProductDetail = (req, res) => {
 exports.getIndex = (req, res) => {
 	Product.find()
 		.then((products) => {
+			const loginData = req.get('Cookie').includes('completedAuthentication=true');
 			res.render('shop/index', {
 				prods: products,
 				pageTitle: 'Shop',
 				path: '/',
+				isAuthenticated: loginData,
 			});
 		})
 		.catch((e) => {
@@ -58,10 +64,12 @@ exports.getCart = (req, res) => {
 			//! Since the productId gets nested-populated by the .populate()
 			//! method in mongoose, we need to travel inside of that when
 			//! calling the res.render()
+			const loginData = req.get('Cookie').includes('completedAuthentication=true');
 			res.render('shop/cart', {
 				path: '/cart',
 				pageTitle: 'Your Cart',
 				cartItems: cartItemsArray.items,
+				isAuthenticated: loginData,
 			});
 		})
 		.catch((e) => {
@@ -107,9 +115,11 @@ exports.getOrders = (req, res) => {
 	Order.find({ userId: req.user._id })
 		.then((orderino) => {
 			//? Render the orders page considering the found orders, if any
+			const loginData = req.get('Cookie').includes('completedAuthentication=true');
 			res.render('shop/orders', {
 				path: '/orders',
 				pageTitle: 'Your Orders',
+				isAuthenticated: loginData,
 				orders: orderino == null ? [] : orderino, //? Gives back an empty array if no orders were found
 			});
 		})
@@ -165,8 +175,10 @@ exports.postOrders = (req, res) => {
 };
 
 exports.getCheckout = (req, res) => {
+	const loginData = req.get('Cookie').includes('completedAuthentication=true');
 	res.render('shop/checkout', {
 		path: '/checkout',
 		pageTitle: 'Checkout',
+		isAuthenticated: loginData,
 	});
 };
