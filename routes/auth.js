@@ -8,4 +8,6 @@ router.get('/authenticate', loginController.getLogin);
 
 router.post('/login-attempt', loginController.postLogin);
 
+router.post('/disconnect', loginController.postLogout);
+
 module.exports = router;
