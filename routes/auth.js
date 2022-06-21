@@ -15,7 +15,7 @@ router.get('/authenticate', loginController.getLogin);
 router.get('/register', loginController.getSignUp);
 
 //? This is the sign up attempt when clicking "Sign up" in "/register"
-router.post('/register', loginController.postSignUp);
+router.post('/new-account', loginController.postSignUp);
 
 //? This is the login attempt when clicking "Login" in "/authenticate"
 router.post('/login-attempt', loginController.postLogin);

@@ -50,18 +50,23 @@ exports.postSignUp = (req, res, next) => {
 	const email = req.body.email;
 	const password = req.body.password;
 	const secondPassword = req.body.passwordConfirmation;
-	console.log(email, password);
+	console.log(email, password, secondPassword);
 	//? Looks up if there is an user with this email
-	User.find({ email: email }).then((user) => {
-		//? If this user exists, errors out to avoid duplicated data
-		if (!user) {
-		}
-		//? If this user doesn't exist yet, proceed forward creating this account
-		else {
-			//? After creating the account, log in and redirect to main page
-			req.session.user = user;
-			req.session.isAuthenticated = true;
-			res.redirect('/');
-		}
-	});
+	User.findOne({ email: email })
+		.then((user) => {
+			//? If this user exists, errors out to avoid duplicated data
+			if (!user) {
+			}
+			//? If this user doesn't exist yet, proceed forward creating this account
+			else {
+				//? After creating the account, log in and redirect to main page
+				req.session.user = user;
+				req.session.isAuthenticated = true;
+				res.redirect('/');
+			}
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/register');
+		});
 };
