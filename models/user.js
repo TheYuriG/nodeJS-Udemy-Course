@@ -1,12 +1,12 @@
 //? Require mongoose to setup the document schema
 const mongoose = require('mongoose');
-const product = require('./product');
 const Schema = mongoose.Schema;
 
 //? Create a new schema for how an User is defined
 const schemaForUsers = new Schema({
 	name: { type: String, required: true }, //? All users need a name
 	email: { type: String, required: true }, //? All users need an email
+	password: { type: String, required: true }, //? All users need a password
 	cart: {
 		//? All users need a cart
 		items: [

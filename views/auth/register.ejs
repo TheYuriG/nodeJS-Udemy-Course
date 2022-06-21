@@ -9,7 +9,11 @@
   <main>
     <form class="login-form" action="/new-account" method="POST">
       <div class="form-control">
-        <label for="email">Username or email</label>
+        <label for="name">Name</label>
+        <input type="name" name="name" id="name">
+      </div>
+      <div class="form-control">
+        <label for="email">Email</label>
         <input type="email" name="email" id="email">
       </div>
       <div class="form-control">
@@ -20,8 +24,7 @@
         <label for="confirm-password">Confirm Password</label>
         <input type="password" name="passwordConfirmation" id="password">
       </div>
-      <button class="btn" type="submit">Register
-      </button>
+      <button class="btn" type="submit">Register</button>
     </form>
   </main>
   <%- include('../includes/end.ejs') %>
