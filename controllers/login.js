@@ -11,6 +11,16 @@ exports.getLogin = (req, res, next) => {
 	});
 };
 
+//? Loads the sign up page
+exports.getSignUp = (req, res, next) => {
+	const loginData = req.session.isAuthenticated ? true : false;
+	res.render('auth/register', {
+		path: '/register',
+		pageTitle: 'Create your account',
+		isAuthenticated: loginData,
+	});
+};
+
 //? Processes the login request from the client at "/authenticate"
 exports.postLogin = (req, res, next) => {
 	//? Pulls the data from the User model for this user and then

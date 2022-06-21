@@ -11,6 +11,9 @@ const router = express.Router();
 //? This is the login page
 router.get('/authenticate', loginController.getLogin);
 
+//? This is the sign up page
+router.get('/register', loginController.getSignUp);
+
 //? This is the login attempt when clicking "Login" in "/authenticate"
 router.post('/login-attempt', loginController.postLogin);
 
