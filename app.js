@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoSessionStore = require('connect-mongodb-session')(session);
+
 //? Project imports
 const errorController = require('./controllers/error');
 
@@ -59,25 +60,6 @@ mongoose
 		//? Sets up which port this website will be displayed to on localhost
 		//? if the database fully connects as it should
 		app.listen(3000, () => {
-			//? Check the user database for any existing users
-			User.findOne().then((user) => {
-				//? If there is no user,
-				if (!user) {
-					//? We create a new user on first login and then manually
-					//? fetch from the database so their ID can be used
-					//? on every request
-					const user = new User({
-						email: 'user@domain.com',
-						name: 'user',
-						password: 'password',
-						cart: { items: [] },
-					});
-					user.save();
-					//? After the user is created, we need to manually pull its ID
-					//? and hardcode it in the app.use() middleware on line 32
-					console.log('User created');
-				}
-			});
 			console.log('Server listening on port 3000');
 		});
 	})
