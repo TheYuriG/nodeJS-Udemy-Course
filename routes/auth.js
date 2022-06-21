@@ -14,6 +14,9 @@ router.get('/authenticate', loginController.getLogin);
 //? This is the sign up page
 router.get('/register', loginController.getSignUp);
 
+//? This is the sign up attempt when clicking "Sign up" in "/register"
+router.post('/register', loginController.postSignUp);
+
 //? This is the login attempt when clicking "Login" in "/authenticate"
 router.post('/login-attempt', loginController.postLogin);
 

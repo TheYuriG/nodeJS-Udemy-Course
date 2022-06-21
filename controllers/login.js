@@ -11,18 +11,11 @@ exports.getLogin = (req, res, next) => {
 	});
 };
 
-//? Loads the sign up page
-exports.getSignUp = (req, res, next) => {
-	const loginData = req.session.isAuthenticated ? true : false;
-	res.render('auth/register', {
-		path: '/register',
-		pageTitle: 'Create your account',
-		isAuthenticated: loginData,
-	});
-};
-
 //? Processes the login request from the client at "/authenticate"
 exports.postLogin = (req, res, next) => {
+	const email = req.body.email;
+	const password = req.body.password;
+	console.log(email, password);
 	//? Pulls the data from the User model for this user and then
 	//? attach this data to req.session for usage in further requests
 	User.findById('62ae6c054ccbec553949b3d7').then((user) => {
@@ -39,5 +32,36 @@ exports.postLogout = (req, res, next) => {
 	req.session.destroy(() => {
 		//? While you can Logout from anywhere, doing so will redirect you to home
 		res.redirect('/');
+	});
+};
+
+//? Loads the sign up page
+exports.getSignUp = (req, res, next) => {
+	const loginData = req.session.isAuthenticated ? true : false;
+	res.render('auth/register', {
+		path: '/register',
+		pageTitle: 'Create your account',
+		isAuthenticated: loginData,
+	});
+};
+
+//? Loads the sign up page
+exports.postSignUp = (req, res, next) => {
+	const email = req.body.email;
+	const password = req.body.password;
+	const secondPassword = req.body.passwordConfirmation;
+	console.log(email, password);
+	//? Looks up if there is an user with this email
+	User.find({ email: email }).then((user) => {
+		//? If this user exists, errors out to avoid duplicated data
+		if (!user) {
+		}
+		//? If this user doesn't exist yet, proceed forward creating this account
+		else {
+			//? After creating the account, log in and redirect to main page
+			req.session.user = user;
+			req.session.isAuthenticated = true;
+			res.redirect('/');
+		}
 	});
 };
