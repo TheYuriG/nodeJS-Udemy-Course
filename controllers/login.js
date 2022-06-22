@@ -1,3 +1,6 @@
+//? Package imports
+const bcrypt = require('bcryptjs');
+
 //? Imports the User model so the User model is attached to every request.session
 const User = require('../models/user');
 
@@ -50,32 +53,31 @@ exports.postSignUp = (req, res, next) => {
 	const name = req.body.name;
 	const email = req.body.email;
 	const password = req.body.password;
-	const secondPassword = req.body.passwordConfirmation;
-	console.log(name, email, password, secondPassword);
+	const passwordConfirmation = req.body.passwordConfirmation;
 	//? Looks up if there is an user with this email
 	User.findOne({ email: email })
 		.then((user) => {
 			//? If this user exists, errors out to avoid duplicated data
 			if (!user) {
-				return res.redirect('/authenticate');
+				throw Error('This user already exists!');
+			} else if (password !== passwordConfirmation) {
+				throw Error('Passwords do not match!');
 			}
 			//? If this user doesn't exist yet, proceed forward creating this account
-			else {
-				if (password !== passwordConfirmation) {
-					return res.redirect('/authenticate');
-				}
-				const user = new User({ name: name, email: email, password: password, cart: { items: [] } });
-
-				user.save().then(() => {
-					//? After creating the account, log in and redirect to main page
-					req.session.user = user;
-					req.session.isAuthenticated = true;
-					res.redirect('/');
-				});
-			}
+			return bcrypt.hash(password, 12);
+		})
+		.then((hashPassword) => {
+			const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
+			return user.save();
+		})
+		.then((user) => {
+			//? After creating the account, log in and redirect to main page
+			req.session.user = user;
+			req.session.isAuthenticated = true;
+			res.redirect('/');
 		})
 		.catch((e) => {
-			console.log(e);
-			res.redirect('/register');
+			res.registerError = e;
+			res.redirect('/authenticate');
 		});
 };
