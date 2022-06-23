@@ -66,16 +66,18 @@ exports.postSignUp = (req, res, next) => {
 				return res.redirect('/register');
 			}
 			//? If this user doesn't exist yet, proceed forward creating this account
-			return bcrypt.hash(password, 12).then((hashPassword) => {
-				const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
-				return user.save();
-			});
-		})
-		.then((user) => {
-			//? After creating the account, log in and redirect to main page
-			req.session.user = user;
-			req.session.isAuthenticated = true;
-			res.redirect('/');
+			return bcrypt
+				.hash(password, 12)
+				.then((hashPassword) => {
+					const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
+					return user.save();
+				})
+				.then((user) => {
+					//? After creating the account, log in and redirect to main page
+					req.session.user = user;
+					req.session.isAuthenticated = true;
+					res.redirect('/');
+				});
 		})
 		.catch((e) => {
 			res.registerError = e;
