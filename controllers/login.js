@@ -60,15 +60,16 @@ exports.postSignUp = (req, res, next) => {
 			//? If this user exists, errors out to avoid duplicated data
 			if (!user) {
 				throw Error('This user already exists!');
+				return res.redirect('/register');
 			} else if (password !== passwordConfirmation) {
 				throw Error('Passwords do not match!');
+				return res.redirect('/register');
 			}
 			//? If this user doesn't exist yet, proceed forward creating this account
-			return bcrypt.hash(password, 12);
-		})
-		.then((hashPassword) => {
-			const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
-			return user.save();
+			return bcrypt.hash(password, 12).then((hashPassword) => {
+				const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
+				return user.save();
+			});
 		})
 		.then((user) => {
 			//? After creating the account, log in and redirect to main page
