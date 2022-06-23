@@ -16,16 +16,31 @@ exports.getLogin = (req, res, next) => {
 
 //? Processes the login request from the client at "/authenticate"
 exports.postLogin = (req, res, next) => {
-	const email = req.body.email;
-	const password = req.body.password;
-	console.log(email, password);
+	const postLoginEmail = req.body.email;
+	const postLoginPassword = req.body.password;
 	//? Pulls the data from the User model for this user and then
 	//? attach this data to req.session for usage in further requests
-	User.findById('62ae6c054ccbec553949b3d7').then((user) => {
-		req.session.user = user;
-		req.session.isAuthenticated = true;
-		//? Redirects to main once done
-		res.redirect('/');
+	User.findOne({ email: postLoginEmail }).then((user) => {
+		if (!user) {
+			return res.redirect('/authenticate');
+		}
+		bcrypt
+			.compare(postLoginPassword, user.password)
+			.then((passwordsAreMatching) => {
+				if (passwordsAreMatching) {
+					req.session.user = user;
+					req.session.isAuthenticated = true;
+					return req.session.save((err) => {
+						if (err) {
+							console.log(err);
+						}
+						//? Redirects to main once done
+						res.redirect('/');
+					});
+				}
+				return res.redirect('/authenticate');
+			})
+			.catch((e) => {});
 	});
 };
 
@@ -58,12 +73,10 @@ exports.postSignUp = (req, res, next) => {
 	User.findOne({ email: email })
 		.then((user) => {
 			//? If this user exists, errors out to avoid duplicated data
-			if (!user) {
+			if (user) {
 				throw Error('This user already exists!');
-				return res.redirect('/register');
 			} else if (password !== passwordConfirmation) {
 				throw Error('Passwords do not match!');
-				return res.redirect('/register');
 			}
 			//? If this user doesn't exist yet, proceed forward creating this account
 			return bcrypt
@@ -72,15 +85,13 @@ exports.postSignUp = (req, res, next) => {
 					const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
 					return user.save();
 				})
-				.then((user) => {
+				.then((result) => {
 					//? After creating the account, log in and redirect to main page
-					req.session.user = user;
-					req.session.isAuthenticated = true;
-					res.redirect('/');
+					res.redirect('/authenticate');
 				});
 		})
 		.catch((e) => {
-			res.registerError = e;
-			res.redirect('/authenticate');
+			console.error(e);
+			res.redirect('/register');
 		});
 };
