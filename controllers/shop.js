@@ -56,31 +56,27 @@ exports.getIndex = (req, res) => {
 
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res) => {
-	if (req.session.user) {
-		User.findById(req.session.user._id)
-			.then((user) => {
-				user.getCart().then((cartItemsArray) => {
-					//? Then render the cart page with whatever content
-					//? there is in the cart or just an empty cart
-					//! Since the productId gets nested-populated by the .populate()
-					//! method in mongoose, we need to travel inside of that when
-					//! calling the res.render()
-					const loginData = req.session.isAuthenticated ? true : false;
-					res.render('shop/cart', {
-						path: '/cart',
-						pageTitle: 'Your Cart',
-						cartItems: cartItemsArray.items,
-						isAuthenticated: loginData,
-					});
+	User.findById(req.session.user._id)
+		.then((user) => {
+			user.getCart().then((cartItemsArray) => {
+				//? Then render the cart page with whatever content
+				//? there is in the cart or just an empty cart
+				//! Since the productId gets nested-populated by the .populate()
+				//! method in mongoose, we need to travel inside of that when
+				//! calling the res.render()
+				const loginData = req.session.isAuthenticated ? true : false;
+				res.render('shop/cart', {
+					path: '/cart',
+					pageTitle: 'Your Cart',
+					cartItems: cartItemsArray.items,
+					isAuthenticated: loginData,
 				});
-			})
-			.catch((e) => {
-				console.log(e);
-				res.redirect('/404');
 			});
-	} else {
-		res.redirect('/');
-	}
+		})
+		.catch((e) => {
+			console.log(e);
+			res.redirect('/404');
+		});
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons

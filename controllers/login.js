@@ -40,7 +40,10 @@ exports.postLogin = (req, res, next) => {
 				}
 				return res.redirect('/authenticate');
 			})
-			.catch((e) => {});
+			.catch((e) => {
+				console.log(e);
+				return res.redirect('/authenticate');
+			});
 	});
 };
 
