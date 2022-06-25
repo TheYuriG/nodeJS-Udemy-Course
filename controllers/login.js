@@ -6,11 +6,9 @@ const User = require('../models/user');
 
 //? Loads the login page for the client
 exports.getLogin = (req, res, next) => {
-	const loginData = req.session.isAuthenticated ? true : false;
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
-		isAuthenticated: loginData,
 	});
 };
 
@@ -58,11 +56,9 @@ exports.postLogout = (req, res, next) => {
 
 //? Loads the sign up page
 exports.getSignUp = (req, res, next) => {
-	const loginData = req.session.isAuthenticated ? true : false;
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
-		isAuthenticated: loginData,
 	});
 };
 
