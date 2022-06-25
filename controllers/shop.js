@@ -135,7 +135,6 @@ exports.postOrders = (req, res) => {
 		itemObject.price = orderItem.productId.price;
 		itemObject.description = orderItem.productId.description;
 		itemObject.quantity = orderItem.quantity;
-		itemObject.userId = req.session.user._id;
 		return itemObject;
 	});
 
@@ -148,15 +147,17 @@ exports.postOrders = (req, res) => {
 	const order = new Order({ userId: req.session.user._id, items: parsedOrder });
 	order
 		.save()
-		.then((order) => {
-			// console.log('user order stored successfully. now emptying user cart');
-			req.session.user.cart.items = [];
-			return req.session.user.save().then((success) => {
-				// console.log('user cart emptied and stored successfully');
-				//? Once you finish processing and storing this current order,
-				//? redirect the user to the orders page and display the orders
-				res.redirect('/orders');
-			});
+		.then(() =>
+			User.findById(req.session.user._id).then((user) => {
+				req.session.user = user;
+				req.session.user.cart.items = [];
+				req.session.user.save();
+			})
+		)
+		.then((success) => {
+			//? Once you finish processing and storing this current order,
+			//? redirect the user to the orders page and display the orders
+			res.redirect('/orders');
 		})
 		.catch((e) => {
 			console.log(e);
