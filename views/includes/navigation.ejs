@@ -28,6 +28,7 @@
     <ul class="main-header__item-list">
       <li class="main-header__item">
         <form action="/disconnect" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button class="btn" type="submit">Logout</BUTTon>
         </form>
       </li>

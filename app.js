@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoSessionStore = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -17,6 +18,7 @@ const MONGODB_URI = 'mongodb+srv://NodeJS-course:tozY1rQ8LktyZETy@nodejs-tutoria
 const app = express();
 //? Initializes the user session storage
 const sessionStore = new MongoSessionStore({ uri: MONGODB_URI, collection: 'sessions' });
+const csrfProtection = csrf();
 
 //? Sets up EJS as the view engine and explicitly define the views folder
 app.set('view engine', 'ejs');
@@ -46,6 +48,12 @@ app.use(
 		//? the sessions, rather than allocating memory for hundreds of concurrent users
 	})
 );
+app.use(csrfProtection);
+app.use((req, res, next) => {
+	res.locals.isAuthenticated = req.session.isAuthenticated;
+	res.locals.csrfToken = req.csrfToken();
+	next();
+});
 
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public
