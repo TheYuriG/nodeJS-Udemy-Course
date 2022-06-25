@@ -93,8 +93,8 @@ exports.postCartDeletion = (req, res) => {
 	const productoId = req.body.idOfItemToBeDeleted;
 	//? After the cartItem product instance, redirect the user to the cart
 	//? page and display any remaining items in it, if any
-	req.session.user
-		.removeFromCart(productoId)
+	User.findById(req.session.user._id)
+		.then((user) => user.removeFromCart(productoId))
 		.then(() => {
 			res.redirect('/cart');
 		})
@@ -138,7 +138,6 @@ exports.postOrders = (req, res) => {
 		itemObject.userId = req.session.user._id;
 		return itemObject;
 	});
-	// console.log(parsedOrder);
 
 	//? Pass the parsedOrder into the User model to save the order related
 	//? to this cart, since the current price being paid is important in case
