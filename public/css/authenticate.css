@@ -4,3 +4,19 @@
 	margin: auto;
 	display: block;
 }
+
+.user-message {
+	margin: auto;
+	width: 50%;
+	border: 1px solid blue;
+	padding: 0.5rem;
+	border-radius: 3px;
+	background: rgb(101, 101, 178);
+	text-align: center;
+}
+
+.user-message--error {
+	border-color: red;
+	background: rgb(255, 176, 176);
+	color: red;
+}

@@ -6,10 +6,15 @@ const User = require('../models/user');
 
 //? Loads the login page for the client
 exports.getLogin = (req, res, next) => {
+	let message = null;
+	let tempFlash = req.flash('auth');
+	if (tempFlash.length > 0) {
+		message = tempFlash[0];
+	}
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
-		authError: req.flash('auth'),
+		authError: message,
 	});
 };
 
@@ -21,7 +26,7 @@ exports.postLogin = (req, res, next) => {
 	//? attach this data to req.session for usage in further requests
 	User.findOne({ email: postLoginEmail }).then((user) => {
 		if (!user) {
-			req.flash('auth', 'No account has been created with this email');
+			req.flash('auth', 'There is no account with this email!');
 			console.log(req.authenticationError);
 			return res.redirect('/authenticate');
 		}
@@ -39,7 +44,7 @@ exports.postLogin = (req, res, next) => {
 						res.redirect('/');
 					});
 				}
-				req.flash('auth', "Passwords doesn't match");
+				req.flash('auth', "Passwords doesn't match!");
 				console.log(req.authenticationError);
 				return res.redirect('/authenticate');
 			})
@@ -61,10 +66,15 @@ exports.postLogout = (req, res, next) => {
 
 //? Loads the sign up page
 exports.getSignUp = (req, res, next) => {
+	let message = null;
+	let tempFlash = req.flash('register');
+	if (tempFlash.length > 0) {
+		message = tempFlash[0];
+	}
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
-		registerError: req.flash('register'),
+		registerError: message,
 	});
 };
 

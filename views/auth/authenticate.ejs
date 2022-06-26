@@ -8,7 +8,7 @@
 
   <main>
     <% if (authError != undefined) { %>
-    <div><%= authError %></div>
+    <div class="user-message user-message--error"><%= authError %></div>
     <% } %>
     <form class="login-form" action="/login-attempt" method="POST">
       <div class="form-control">

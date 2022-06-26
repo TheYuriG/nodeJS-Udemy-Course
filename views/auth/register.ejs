@@ -8,7 +8,7 @@
 
   <main>
     <% if (registerError != undefined) { %>
-    <div><%= registerError %></div>
+    <div class="user-message user-message--error"><%= registerError %></div>
     <% } %>
     <form class="login-form" action="/new-account" method="POST">
       <div class="form-control">
