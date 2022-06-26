@@ -7,22 +7,25 @@ const isAuth = require('../util/is-auth.js');
 
 const router = express.Router();
 
+//? Loads the index starting page
 router.get('/', shopController.getIndex);
 
+//? Loads the products page that will display up to so many items
 router.get('/products', shopController.getProducts);
 
 //? Controller to the routes to different items
 router.get('/products/:productId', shopController.getProductDetail);
 
+//? Loads the "/cart" page, if the user is logged in
 router.get('/cart', isAuth, shopController.getCart);
 
-//? Handles the POST request from product-detail into cart and then redirects to GET /cart
+//? Handles the POST request from "Add to Cart" buttons and then redirects to GET /cart
 router.post('/cart', isAuth, shopController.postCart);
 
-//? Handles the deletion POST request from cart so the user can remove items before checkout
+//? Handles the deletion POST request from cart so the user can remove items before checkout, if the user is logged in
 router.post('/cart-delete-item', isAuth, shopController.postCartDeletion);
 
-//? Handles a GET request to /orders
+//? Loads the "/orders" page, if the user is logged in
 router.get('/orders', isAuth, shopController.getOrders);
 
 //? Handles the POST request to "/order-this-cart" when clicking
