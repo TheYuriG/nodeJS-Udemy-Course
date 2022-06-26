@@ -9,6 +9,7 @@ exports.getLogin = (req, res, next) => {
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
+		authError: req.flash('auth'),
 	});
 };
 
@@ -20,6 +21,8 @@ exports.postLogin = (req, res, next) => {
 	//? attach this data to req.session for usage in further requests
 	User.findOne({ email: postLoginEmail }).then((user) => {
 		if (!user) {
+			req.flash('auth', 'No account has been created with this email');
+			console.log(req.authenticationError);
 			return res.redirect('/authenticate');
 		}
 		bcrypt
@@ -36,6 +39,8 @@ exports.postLogin = (req, res, next) => {
 						res.redirect('/');
 					});
 				}
+				req.flash('auth', "Passwords doesn't match");
+				console.log(req.authenticationError);
 				return res.redirect('/authenticate');
 			})
 			.catch((e) => {
@@ -59,6 +64,7 @@ exports.getSignUp = (req, res, next) => {
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
+		registerError: req.flash('register'),
 	});
 };
 
@@ -73,8 +79,10 @@ exports.postSignUp = (req, res, next) => {
 		.then((user) => {
 			//? If this user exists, errors out to avoid duplicated data
 			if (user) {
+				req.flash('register', 'An account already exists with this email!');
 				throw Error('This user already exists!');
 			} else if (password !== passwordConfirmation) {
+				req.flash('register', 'Your passwords do not match!');
 				throw Error('Passwords do not match!');
 			}
 			//? If this user doesn't exist yet, proceed forward creating this account

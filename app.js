@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoSessionStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const flashData = require('connect-flash');
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -48,12 +49,16 @@ app.use(
 		//? the sessions, rather than allocating memory for hundreds of concurrent users
 	})
 );
+//? Sets up the csurf package to protect the website from CSRF attacks
 app.use(csrfProtection);
 app.use((req, res, next) => {
 	res.locals.isAuthenticated = req.session.isAuthenticated;
 	res.locals.csrfToken = req.csrfToken();
 	next();
 });
+//? Store optional error data so we can provide valuable user feedback
+//? if they failed to sign in or sign up
+app.use(flashData());
 
 //? Only start the routes after the bodyparser has been made available and
 //? the CSS files are made public

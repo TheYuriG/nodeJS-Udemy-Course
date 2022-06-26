@@ -7,6 +7,9 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main>
+    <% if (authError != undefined) { %>
+    <div><%= authError %></div>
+    <% } %>
     <form class="login-form" action="/login-attempt" method="POST">
       <div class="form-control">
         <label for="email">Username or email</label>

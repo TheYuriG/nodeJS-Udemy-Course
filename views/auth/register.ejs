@@ -7,6 +7,9 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main>
+    <% if (registerError != undefined) { %>
+    <div><%= registerError %></div>
+    <% } %>
     <form class="login-form" action="/new-account" method="POST">
       <div class="form-control">
         <label for="name">Name</label>
