@@ -1,8 +1,24 @@
 //? Package imports
 const bcrypt = require('bcryptjs');
+const mailer = require('nodemailer');
+const senderGrid = require('nodemailer-sendgrid-transport');
 
 //? Imports the User model so the User model is attached to every request.session
 const User = require('../models/user');
+
+//? After MongoDB, I actually learned to store keys in a safe place and
+//? actually add the files to .gitignore so they don't get uploaded to
+//? GitHub when done. This will allow me to make this repository public
+//? in the future and not worry about having my accounts used
+const { sendGridAPIKey, senderEmail } = require('../util/secrets/keys');
+
+const transporter = mailer.createTransport(
+	senderGrid({
+		auth: {
+			api_key: sendGridAPIKey,
+		},
+	})
+);
 
 //? Loads the login page for the client
 exports.getLogin = (req, res, next) => {
@@ -102,11 +118,19 @@ exports.postSignUp = (req, res, next) => {
 					const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
 					return user.save();
 				})
-				.then((result) => {
-					//? After creating the account, log in and redirect to main page
+				.then(() => {
+					//? After creating the account, redirect to main page
 					res.redirect('/authenticate');
+					//? and then log in and send an email confirming account
+					return transporter.sendMail({
+						to: email, //? email of the created account
+						from: senderEmail, //? email validated in SendGrid
+						subject: `Hello, ${name}! Your account has been created at Shop!`,
+						html: '<h1>Congratulations</h1><p>You can now spend billions on our store</p>',
+					});
 				});
 		})
+		.then(() => console.log('Email sent successfully!'))
 		.catch((e) => {
 			console.error(e);
 			res.redirect('/register');

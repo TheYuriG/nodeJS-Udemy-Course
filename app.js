@@ -14,12 +14,12 @@ const flashData = require('connect-flash');
 const errorController = require('./controllers/error');
 //? The key was voided and recreated and is now stored secretly in this
 //? folder that doesn't get synced to GitHub
-const { mongoDBAPIKey } = require('../util/secrets/keys');
+const { mongoDBAPIKey } = require('./util/secrets/keys');
 
 //? Starts express
 const app = express();
 //? Initializes the user session storage
-const sessionStore = new MongoSessionStore({ uri: MONGODB_URI, collection: 'sessions' });
+const sessionStore = new MongoSessionStore({ uri: mongoDBAPIKey, collection: 'sessions' });
 const csrfProtection = csrf();
 
 //? Sets up EJS as the view engine and explicitly define the views folder
