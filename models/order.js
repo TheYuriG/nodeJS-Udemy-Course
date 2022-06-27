@@ -1,6 +1,5 @@
 //? Require mongoose to setup the document schema
 const mongoose = require('mongoose');
-const user = require('./user');
 const Schema = mongoose.Schema;
 
 //? Create a new schema for how an Order is defined
