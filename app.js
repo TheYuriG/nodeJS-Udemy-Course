@@ -12,8 +12,9 @@ const flashData = require('connect-flash');
 
 //? Project imports
 const errorController = require('./controllers/error');
-
-const MONGODB_URI = 'mongodb+srv://NodeJS-course:tozY1rQ8LktyZETy@nodejs-tutorial.nsxgg.mongodb.net/shop?w=majority';
+//? The key was voided and recreated and is now stored secretly in this
+//? folder that doesn't get synced to GitHub
+const { mongoDBAPIKey } = require('../util/secrets/keys');
 
 //? Starts express
 const app = express();
@@ -68,7 +69,7 @@ app.use(authenticationRoutes);
 app.use(errorController.get404);
 
 mongoose
-	.connect(MONGODB_URI)
+	.connect(mongoDBAPIKey)
 	.then(() => {
 		//? Sets up which port this website will be displayed to on localhost
 		//? if the database fully connects as it should
