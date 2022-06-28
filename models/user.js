@@ -6,6 +6,8 @@ const Schema = mongoose.Schema;
 const schemaForUsers = new Schema({
 	name: { type: String, required: true }, //? All users need a name
 	email: { type: String, required: true }, //? All users need an email
+	resetToken: String,
+	resetTokenExpirationDate: Date,
 	password: { type: String, required: true }, //? All users need a password
 	cart: {
 		//? All users need a cart
