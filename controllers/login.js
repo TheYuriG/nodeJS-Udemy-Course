@@ -113,7 +113,6 @@ exports.postPasswordReset = (req, res, next) => {
 		User.findOne({ email: postLoginEmail }).then((user) => {
 			if (!user) {
 				req.flash('reset', 'There is no account with this email!');
-				console.log(req.authenticationError);
 				return res.redirect('/forgot-password');
 			}
 			user.resetToken = token;
