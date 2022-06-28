@@ -1,3 +1,6 @@
+//? Node imports
+const crypto = require('crypto');
+
 //? Package imports
 const bcrypt = require('bcryptjs');
 const mailer = require('nodemailer');
@@ -83,7 +86,7 @@ exports.postLogout = (req, res, next) => {
 //?
 exports.getPasswordReset = (req, res, next) => {
 	let message = null;
-	let tempFlash = req.flash('auth');
+	let tempFlash = req.flash('reset');
 	if (tempFlash.length > 0) {
 		message = tempFlash[0];
 	}
@@ -97,36 +100,43 @@ exports.getPasswordReset = (req, res, next) => {
 //?
 exports.postPasswordReset = (req, res, next) => {
 	const postLoginEmail = req.body.email;
-	//? Pulls the data from the User model for this user and then
-	//? attach this data to req.session for usage in further requests
-	User.findOne({ email: postLoginEmail }).then((user) => {
-		if (!user) {
-			req.flash('auth', 'There is no account with this email!');
-			console.log(req.authenticationError);
-			return res.redirect('/authenticate');
+
+	crypto.randomBytes(32, (err, buffer) => {
+		if (err) {
+			req.flash('reset', 'Failure to create your password regeneration token');
+			console.log(err);
+			return res.redirect('/forgot-password');
 		}
-		bcrypt
-			.compare(postLoginPassword, user.password)
-			.then((passwordsAreMatching) => {
-				if (passwordsAreMatching) {
-					req.session.user = user;
-					req.session.isAuthenticated = true;
-					return req.session.save((err) => {
-						if (err) {
-							console.log(err);
-						}
-						//? Redirects to main once done
-						res.redirect('/');
-					});
-				}
-				req.flash('auth', "Passwords doesn't match!");
+		const token = buffer.toString('hex');
+		//? Pulls the data from the User model for this user and then
+		//? attach this data to req.session for usage in further requests
+		User.findOne({ email: postLoginEmail }).then((user) => {
+			if (!user) {
+				req.flash('reset', 'There is no account with this email!');
 				console.log(req.authenticationError);
-				return res.redirect('/authenticate');
-			})
-			.catch((e) => {
-				console.log(e);
-				return res.redirect('/authenticate');
-			});
+				return res.redirect('/forgot-password');
+			}
+			user.resetToken = token;
+			user.resetTokenExpirationDate = Date.now() + 3 * 60 * 60 * 1000;
+			return user
+				.save()
+				.then((savedUser) => {
+					return transporter.sendMail({
+						to: postLoginEmail, //? email of the created account
+						from: senderEmail, //? email validated in SendGrid
+						subject: `Password reset request`,
+						html: `
+				<p>A password reset was requested for this email address.</p>
+				<p>If you didn't ask for a password reset, feel free to ignore this email, your account won't be impacted</p>
+				<p>To reset your account's email, click this <a href="http://localhost:300/reset/${token}">link</a> and setup a new password for your account</p>
+				`,
+					});
+				})
+				.catch((e) => {
+					console.log(e);
+					return res.redirect('/forgot-password');
+				});
+		});
 	});
 };
 
