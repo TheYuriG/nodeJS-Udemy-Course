@@ -80,6 +80,56 @@ exports.postLogout = (req, res, next) => {
 	});
 };
 
+//?
+exports.getPasswordReset = (req, res, next) => {
+	let message = null;
+	let tempFlash = req.flash('auth');
+	if (tempFlash.length > 0) {
+		message = tempFlash[0];
+	}
+	res.render('auth/passwordReset', {
+		path: '/passwordReset',
+		pageTitle: 'Reset your password',
+		authError: message,
+	});
+};
+
+//?
+exports.postPasswordReset = (req, res, next) => {
+	const postLoginEmail = req.body.email;
+	//? Pulls the data from the User model for this user and then
+	//? attach this data to req.session for usage in further requests
+	User.findOne({ email: postLoginEmail }).then((user) => {
+		if (!user) {
+			req.flash('auth', 'There is no account with this email!');
+			console.log(req.authenticationError);
+			return res.redirect('/authenticate');
+		}
+		bcrypt
+			.compare(postLoginPassword, user.password)
+			.then((passwordsAreMatching) => {
+				if (passwordsAreMatching) {
+					req.session.user = user;
+					req.session.isAuthenticated = true;
+					return req.session.save((err) => {
+						if (err) {
+							console.log(err);
+						}
+						//? Redirects to main once done
+						res.redirect('/');
+					});
+				}
+				req.flash('auth', "Passwords doesn't match!");
+				console.log(req.authenticationError);
+				return res.redirect('/authenticate');
+			})
+			.catch((e) => {
+				console.log(e);
+				return res.redirect('/authenticate');
+			});
+	});
+};
+
 //? Loads the sign up page
 exports.getSignUp = (req, res, next) => {
 	let message = null;

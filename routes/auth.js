@@ -23,4 +23,10 @@ router.post('/login-attempt', loginController.postLogin);
 //? This is the logoff request, by clicking "Logout" after being logged in
 router.post('/disconnect', loginController.postLogout);
 
+//? On login, user can click to reset password if they forgot it
+router.get('/forgot-password', loginController.getPasswordReset);
+
+//? Fetches user from database and sends them an email reset password
+router.post('/send-me-new-password', loginController.postPasswordReset);
+
 module.exports = router;
