@@ -20,3 +20,9 @@
 	background: rgb(255, 176, 176);
 	color: red;
 }
+
+.user-message--success {
+	border-color: green;
+	background: rgb(124, 244, 126);
+	color: green;
+}

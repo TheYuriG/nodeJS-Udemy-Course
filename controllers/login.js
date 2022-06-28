@@ -30,10 +30,16 @@ exports.getLogin = (req, res, next) => {
 	if (tempFlash.length > 0) {
 		message = tempFlash[0];
 	}
+	let success = null;
+	let tempSuccess = req.flash('success');
+	if (tempSuccess.length > 0) {
+		success = tempSuccess[0];
+	}
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
 		authError: message,
+		success: success,
 	});
 };
 
@@ -90,10 +96,16 @@ exports.getPasswordReset = (req, res, next) => {
 	if (tempFlash.length > 0) {
 		message = tempFlash[0];
 	}
+	let success = null;
+	let tempSuccess = req.flash('success');
+	if (tempSuccess.length > 0) {
+		success = tempSuccess[0];
+	}
 	res.render('auth/passwordReset', {
 		path: '/passwordReset',
 		pageTitle: 'Reset your password',
-		authError: message,
+		passwordResetError: message,
+		success: success,
 	});
 };
 
@@ -131,6 +143,10 @@ exports.postPasswordReset = (req, res, next) => {
 				`,
 					});
 				})
+				.then(() => {
+					req.flash('success', 'Your reset email was sent, please check your inbox/spam folder!');
+					res.redirect('/forgot-password');
+				})
 				.catch((e) => {
 					console.log(e);
 					return res.redirect('/forgot-password');
@@ -146,10 +162,16 @@ exports.getSignUp = (req, res, next) => {
 	if (tempFlash.length > 0) {
 		message = tempFlash[0];
 	}
+	let success = null;
+	let tempSuccess = req.flash('success');
+	if (tempSuccess.length > 0) {
+		success = tempSuccess[0];
+	}
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
 		registerError: message,
+		success: success,
 	});
 };
 
