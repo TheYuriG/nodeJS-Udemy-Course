@@ -36,17 +36,17 @@ const transporter = mailer.createTransport(
 );
 
 //? Loads the login page for the client
-exports.getLogin = (req, res, next) => {
+exports.getLogin = (req, res) => {
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
-		authError: flashMessage(req.flash('auth')),
-		success: flashMessage(req.flash('success')),
+		authError: flashMessage(req.flash('auth')), //? Adds error message, if any
+		success: flashMessage(req.flash('success')), //? Adds success message, if any
 	});
 };
 
 //? Processes the login request from the client at "/authenticate"
-exports.postLogin = (req, res, next) => {
+exports.postLogin = (req, res) => {
 	const postLoginEmail = req.body.email;
 	const postLoginPassword = req.body.password;
 	//? Pulls the data from the User model for this user and then
@@ -81,7 +81,7 @@ exports.postLogin = (req, res, next) => {
 };
 
 //? Processes clicking the "Logout" button on the navigation bar
-exports.postLogout = (req, res, next) => {
+exports.postLogout = (req, res) => {
 	//? Destroys this user's session and forces them to login again
 	req.session.destroy(() => {
 		//? While you can Logout from anywhere, doing so will redirect you to home
@@ -90,18 +90,18 @@ exports.postLogout = (req, res, next) => {
 };
 
 //? Loads the page to request a password reset
-exports.getPasswordReset = (req, res, next) => {
+exports.getPasswordReset = (req, res) => {
 	res.render('auth/passwordReset', {
 		path: '/passwordReset',
 		pageTitle: 'Reset your password',
-		passwordResetError: flashMessage(req.flash('reset')),
-		success: flashMessage(req.flash('success')),
+		passwordResetError: flashMessage(req.flash('reset')), //? Adds error message, if any
+		success: flashMessage(req.flash('success')), //? Adds success message, if any
 	});
 };
 
 //? Handles the request when clicking on "Reset Password" at
 //? "/forgot-password", which is a POST request to "/send-me-new-password"
-exports.postPasswordReset = (req, res, next) => {
+exports.postPasswordReset = (req, res) => {
 	const postLoginEmail = req.body.email;
 
 	crypto.randomBytes(32, (err, buffer) => {
@@ -146,18 +146,109 @@ exports.postPasswordReset = (req, res, next) => {
 	});
 };
 
+//? Loads the page to reset your password, via link sent through email
+//? at "/forgot-password". This will load "/password-reset"
+exports.getResetPasswordNow = (req, res) => {
+	//? Pulls the user password resetToken from the url params
+	let resetToken = req.params.resetToken;
+	//? Looks up for an user in the database that has this resetToken
+	User.findOne({ resetToken: resetToken }).then((user) => {
+		if (!user) {
+			//? If no user is found, detract the password boxes and
+			//? display an error message
+			req.flash('newPassword', "This password reset link isn't valid");
+		} else if (user.resetTokenExpirationDate < Date.now()) {
+			//? If the user takes too long to click the email link
+			//? return them a message of expired link and tell them to
+			//? request another password reset. Current timer is 24 hours
+			req.flash('newPassword', 'This link has expired');
+		}
+		//? Renders the page according to any errors above. If no errors,
+		//? display both password and confirmPassword boxes so the user
+		//? can input what they aim to use as the new password
+		res.render('auth/createNewPassword', {
+			path: '/password-reset',
+			pageTitle: 'Define your new password now',
+			resetToken: resetToken, //? Passes the reset token to the page
+			//? so it can be used to render a hidden <input> and be used
+			//? on the POST request to find the user
+			newPasswordError: flashMessage(req.flash('newPassword')), //? Adds error message, if any
+			success: flashMessage(req.flash('success')), //? Adds success message, if any
+		});
+	});
+};
+
+//? Processes the newly sent password to the server and replaces old password
+exports.postResettingPasswordNow = (req, res) => {
+	//? Temp store both password and password confirmation
+	const password1 = req.body.password;
+	const password2 = req.body.passwordConfirmation;
+	//? Temp store the token of this password reset request
+	const resetToken = req.body.resetToken;
+
+	//? Look through the database for someone with this matching resetToken
+	User.findOne({ resetToken: resetToken })
+		.then((user) => {
+			if (!user) {
+				//? If no matching user is found, error the request and redirect
+				//? the user to the reset password page.
+				req.flash('passwordResetError', "This password reset link isn't valid");
+				return res.redirect('/forgot-password');
+			} else if (user.resetTokenExpirationDate < Date.now()) {
+				//? If the user clicked the link after the timer, give them an
+				//? error and get them to request another password, again
+				req.flash(
+					'passwordResetError',
+					'The password reset link that you used has expired. Please request a new one.'
+				);
+				return res.redirect('/forgot-password');
+			} else if (password1 !== password2) {
+				//? If both of the passwords the user tried don't match each other,
+				//? error out the user and make them reload the page
+				req.flash('newPassword', 'Your passwords do not match! Reload and try again');
+				return res.redirect('/password-reset/' + resetToken);
+			}
+			//? If everything went right and the passwords match, hash the password
+			return bcrypt
+				.hash(password1, 12)
+				.then((hashPassword) => {
+					//? Invalidate the token timer so the user can't use the same link to
+					//? change the password again after just having done that
+					user.resetTokenExpirationDate = Date.now() - 3 * 60 * 60 * 1000;
+					user.password = hashPassword;
+					//? Save the user with updated password and invalidated token to the database
+					return user.save();
+				})
+				.then(() => {
+					req.flash('success', 'Your password was changed! Please log in again.');
+					//TODO send email to the user confirming that they changed password
+					//TODO and tell them to change the password again if this wasn't them
+					res.redirect('/authenticate');
+				});
+		})
+		.catch((e) => {
+			//? Log and default error if something went wrong in the process
+			console.log(e);
+			req.flash(
+				'newPassword',
+				'Something went wrong internally, please contact the system administrator about this.'
+			);
+			return res.redirect('/password-reset/' + resetToken);
+		});
+};
+
 //? Loads the sign up page
-exports.getSignUp = (req, res, next) => {
+exports.getSignUp = (req, res) => {
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
-		registerError: flashMessage(req.flash('register')),
-		success: flashMessage(req.flash('success')),
+		registerError: flashMessage(req.flash('register')), //? Adds error message, if any
+		success: flashMessage(req.flash('success')), //? Adds success message, if any
 	});
 };
 
 //? Loads the sign up page
-exports.postSignUp = (req, res, next) => {
+exports.postSignUp = (req, res) => {
 	const name = req.body.name;
 	const email = req.body.email;
 	const password = req.body.password;

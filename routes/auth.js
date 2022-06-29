@@ -29,4 +29,10 @@ router.get('/forgot-password', loginController.getPasswordReset);
 //? Fetches user from database and sends them an email reset password
 router.post('/send-me-new-password', loginController.postPasswordReset);
 
+//?
+router.get('/password-reset/:resetToken', loginController.getResetPasswordNow);
+
+//?
+router.post('/update-old-password', loginController.postResettingPasswordNow);
+
 module.exports = router;
