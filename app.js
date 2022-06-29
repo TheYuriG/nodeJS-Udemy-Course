@@ -14,7 +14,7 @@ const flashData = require('connect-flash');
 const errorController = require('./controllers/error');
 //? The key was voided and recreated and is now stored secretly in this
 //? folder that doesn't get synced to GitHub
-const { mongoDBAPIKey } = require('./util/secrets/keys');
+const { mongoDBAPIKey, saltSecret } = require('./util/secrets/keys');
 
 //? Starts express
 const app = express();
@@ -41,7 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //? that would happen if all sessions were allocated in memory
 app.use(
 	session({
-		secret: 'longestPossibleStringToHashAsIfThisWasProduction',
+		secret: saltSecret,
 		//? "secret" will define your security. The longer this is, the harder it will be to decrypt your session hash
 		resave: false, //? Set the session to not save again unless data was changed
 		saveUninitialized: false, //? Similar to resave, improves performance
