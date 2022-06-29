@@ -9,6 +9,16 @@ const senderGrid = require('nodemailer-sendgrid-transport');
 //? Imports the User model so the User model is attached to every request.session
 const User = require('../models/user');
 
+//? Helper function to return the flash content of a request but
+//? will return null if there is no message flashed
+function flashMessage(flash) {
+	let message = flash;
+	if (message.length > 0) {
+		return message[0];
+	}
+	return null;
+}
+
 //? After MongoDB, I actually learned to store keys in a safe place and
 //? actually add the files to .gitignore so they don't get uploaded to
 //? GitHub when done. This will allow me to make this repository public
@@ -25,21 +35,11 @@ const transporter = mailer.createTransport(
 
 //? Loads the login page for the client
 exports.getLogin = (req, res, next) => {
-	let message = null;
-	let tempFlash = req.flash('auth');
-	if (tempFlash.length > 0) {
-		message = tempFlash[0];
-	}
-	let success = null;
-	let tempSuccess = req.flash('success');
-	if (tempSuccess.length > 0) {
-		success = tempSuccess[0];
-	}
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
-		authError: message,
-		success: success,
+		authError: flashMessage(req.flash('auth')),
+		success: flashMessage(req.flash('success')),
 	});
 };
 
@@ -52,7 +52,6 @@ exports.postLogin = (req, res, next) => {
 	User.findOne({ email: postLoginEmail }).then((user) => {
 		if (!user) {
 			req.flash('auth', 'There is no account with this email!');
-			console.log(req.authenticationError);
 			return res.redirect('/authenticate');
 		}
 		bcrypt
@@ -70,7 +69,6 @@ exports.postLogin = (req, res, next) => {
 					});
 				}
 				req.flash('auth', "Passwords doesn't match!");
-				console.log(req.authenticationError);
 				return res.redirect('/authenticate');
 			})
 			.catch((e) => {
@@ -89,27 +87,18 @@ exports.postLogout = (req, res, next) => {
 	});
 };
 
-//?
+//? Loads the page to request a password reset
 exports.getPasswordReset = (req, res, next) => {
-	let message = null;
-	let tempFlash = req.flash('reset');
-	if (tempFlash.length > 0) {
-		message = tempFlash[0];
-	}
-	let success = null;
-	let tempSuccess = req.flash('success');
-	if (tempSuccess.length > 0) {
-		success = tempSuccess[0];
-	}
 	res.render('auth/passwordReset', {
 		path: '/passwordReset',
 		pageTitle: 'Reset your password',
-		passwordResetError: message,
-		success: success,
+		passwordResetError: flashMessage(req.flash('reset')),
+		success: flashMessage(req.flash('success')),
 	});
 };
 
-//?
+//? Handles the request when clicking on "Reset Password" at
+//? "/forgot-password", which is a POST request to "/send-me-new-password"
 exports.postPasswordReset = (req, res, next) => {
 	const postLoginEmail = req.body.email;
 
@@ -157,21 +146,11 @@ exports.postPasswordReset = (req, res, next) => {
 
 //? Loads the sign up page
 exports.getSignUp = (req, res, next) => {
-	let message = null;
-	let tempFlash = req.flash('register');
-	if (tempFlash.length > 0) {
-		message = tempFlash[0];
-	}
-	let success = null;
-	let tempSuccess = req.flash('success');
-	if (tempSuccess.length > 0) {
-		success = tempSuccess[0];
-	}
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
-		registerError: message,
-		success: success,
+		registerError: flashMessage(req.flash('register')),
+		success: flashMessage(req.flash('success')),
 	});
 };
 
