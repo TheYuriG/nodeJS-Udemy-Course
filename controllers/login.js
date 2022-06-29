@@ -19,10 +19,12 @@ function flashMessage(flash) {
 	return null;
 }
 
-//? After MongoDB, I actually learned to store keys in a safe place and
-//? actually add the files to .gitignore so they don't get uploaded to
-//? GitHub when done. This will allow me to make this repository public
-//? in the future and not worry about having my accounts used
+//? Keys will be added to a file listed in .gitignore so they don't get
+//? uploaded to GitHub when done. This allows this repository to go public
+//? without worrying about having the test accounts (MongoDB + Compass, SendGrid)
+//? used maliciously by others
+//TODO Add a readme.md that outlines the need to setup a MongoDB and
+//TODO SendGrid accounts so people can actually test features if they clone this
 const { sendGridAPIKey, senderEmail } = require('../util/secrets/keys');
 
 const transporter = mailer.createTransport(
@@ -128,7 +130,7 @@ exports.postPasswordReset = (req, res, next) => {
 						html: `
 				<p>A password reset was requested for this email address.</p>
 				<p>If you didn't ask for a password reset, feel free to ignore this email, your account won't be impacted</p>
-				<p>To reset your account's email, click this <a href="http://localhost:300/reset/${token}">link</a> and setup a new password for your account</p>
+				<p>To reset your account's email, click this <a href="http://localhost:3000/password-reset/${token}">link</a> and setup a new password for your account</p>
 				`,
 					});
 				})
