@@ -93,7 +93,7 @@ exports.postEditProduct = (req, res) => {
 	Product.findById(id)
 		.then((product) => {
 			if (product.userId.toString() !== req.session.user._id.toString()) {
-				return;
+				return res.redirect('/admin/products');
 			}
 
 			//? Manually update the data of the product
