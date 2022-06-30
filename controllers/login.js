@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mailer = require('nodemailer');
 const senderGrid = require('nodemailer-sendgrid-transport');
+const Valid = require('validatorjs');
 
 //? Imports the User model so the User model is attached to every request.session
 const User = require('../models/user');
@@ -173,6 +174,7 @@ exports.getResetPasswordNow = (req, res) => {
 			//? so it can be used to render a hidden <input> and be used
 			//? on the POST request to find the user
 			newPasswordError: flashMessage(req.flash('newPassword')), //? Adds error message, if any
+			badPassword: flashMessage(req.flash('invalidPassword')), //? Gives a non-blocking error message
 			success: flashMessage(req.flash('success')), //? Adds success message, if any
 		});
 	});
@@ -185,6 +187,21 @@ exports.postResettingPasswordNow = (req, res) => {
 	const password2 = req.body.passwordConfirmation;
 	//? Temp store the token of this password reset request
 	const resetToken = req.body.resetToken;
+
+	if (password1 !== password2) {
+		//? If the passwords don't match, inform the user of the mistake
+		req.flash('invalidPassword', 'Your passwords do not match! Try again');
+		return res.redirect('/password-reset/' + resetToken);
+	}
+
+	//? Creates a validation class and checks for password length and
+	//? returns a failure as true if smaller than 8 chars
+	const passwordValidation = new Valid({ password: password1 }, { password: 'required|string|min:8' });
+	if (passwordValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('invalidPassword', 'Your passwords are required to be at least 8 characters long,');
+		return res.redirect('/password-reset/' + resetToken);
+	}
 
 	//? Look through the database for someone with this matching resetToken
 	User.findOne({ resetToken: resetToken })
@@ -202,11 +219,6 @@ exports.postResettingPasswordNow = (req, res) => {
 					'The password reset link that you used has expired. Please request a new one.'
 				);
 				return res.redirect('/forgot-password');
-			} else if (password1 !== password2) {
-				//? If both of the passwords the user tried don't match each other,
-				//? error out the user and make them reload the page
-				req.flash('newPassword', 'Your passwords do not match! Reload and try again');
-				return res.redirect('/password-reset/' + resetToken);
 			}
 			//? If everything went right and the passwords match, hash the password
 			return bcrypt
