@@ -16,6 +16,8 @@ exports.postAddProduct = (req, res) => {
 	const imageUrl = req.body.imageUrl;
 	const price = req.body.price;
 	const description = req.body.description;
+
+	//? Create a product with that data
 	const product = new Product({
 		title: title,
 		price: price,
@@ -23,9 +25,12 @@ exports.postAddProduct = (req, res) => {
 		imageUrl: imageUrl,
 		userId: req.session.user._id,
 	});
+
+	//? Save the product to the database
 	product
 		.save()
 		.then(() => {
+			//? Log the success and redirect
 			console.log('Product has been created');
 			res.redirect('/admin/products');
 		})
@@ -33,7 +38,6 @@ exports.postAddProduct = (req, res) => {
 };
 
 //? Fills the forms with data of a given product and allows editing it
-//! Query is the part after the "?" that you can pass arguments to
 exports.getEditProduct = (req, res) => {
 	//? Check if the edit value in query is set to true and redirect if not
 	//? this value needs to be manually set as true with "?edit=true" on GET
@@ -88,6 +92,10 @@ exports.postEditProduct = (req, res) => {
 	//? Look up the old data of this product in the database
 	Product.findById(id)
 		.then((product) => {
+			if (product.userId.toString() !== req.session.user._id.toString()) {
+				return;
+			}
+
 			//? Manually update the data of the product
 			product.title = title;
 			product.price = price;
@@ -98,7 +106,7 @@ exports.postEditProduct = (req, res) => {
 			return product.save();
 		})
 		.then(() => {
-			console.log('product updated successfully!');
+			//? Redirect the user
 			res.redirect('/admin/products');
 		})
 		.catch(() => {
@@ -110,7 +118,7 @@ exports.postEditProduct = (req, res) => {
 exports.deleteProduct = (req, res) => {
 	//? Gets the ID of the item to be deleted through the POST request
 	const deletionID = req.params.productId;
-	Product.findByIdAndRemove(deletionID)
+	Product.deleteOne({ _id: deletionID, userId: req.session.user._id })
 		.then(() => {
 			//? Redirects (reloads) back to the same /admin/products page which will
 			//? now be missing the item you have just requested to delete
@@ -122,7 +130,7 @@ exports.deleteProduct = (req, res) => {
 //? Loads the page to view all products in admin mode (with edit) only for
 //? the user currently logged in (userId == 1)
 exports.getProducts = (req, res) => {
-	Product.find()
+	Product.find({ userId: req.session.user._id })
 		//? Mongoose has helper functions that enable you to filter in and out
 		//? some specific data
 		// .select('title price -_id')
