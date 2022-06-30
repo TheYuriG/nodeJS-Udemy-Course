@@ -328,6 +328,7 @@ exports.postSignUp = (req, res) => {
 					return user.save();
 				})
 				.then(() => {
+					req.flash('success', 'Your account was created. Please login now!');
 					//? After creating the account, redirect to main page
 					res.redirect('/authenticate');
 					//? and then log in and send an email confirming account
