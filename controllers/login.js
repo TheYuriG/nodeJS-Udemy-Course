@@ -50,6 +50,24 @@ exports.getLogin = (req, res) => {
 exports.postLogin = (req, res) => {
 	const postLoginEmail = req.body.email;
 	const postLoginPassword = req.body.password;
+
+	//? Creates a validation class and checks for email compatibility
+	const emailValidation = new Valid({ email: postLoginEmail }, { email: 'required|email' });
+	if (emailValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('auth', 'Please use a valid email to sign in.');
+		return res.redirect('/authenticate');
+	}
+
+	//? Creates a validation class and checks for password length and
+	//? returns a failure as true if smaller than 8 chars
+	const passwordValidation = new Valid({ password: postLoginPassword }, { password: 'required|string|min:8' });
+	if (passwordValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('auth', 'Your passwords are required to be at least 8 characters long.');
+		return res.redirect('/authenticate');
+	}
+
 	//? Pulls the data from the User model for this user and then
 	//? attach this data to req.session for usage in further requests
 	User.findOne({ email: postLoginEmail }).then((user) => {
