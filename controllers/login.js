@@ -199,7 +199,7 @@ exports.postResettingPasswordNow = (req, res) => {
 	const passwordValidation = new Valid({ password: password1 }, { password: 'required|string|min:8' });
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message and reload the page
-		req.flash('invalidPassword', 'Your passwords are required to be at least 8 characters long,');
+		req.flash('invalidPassword', 'Your passwords are required to be at least 8 characters long.');
 		return res.redirect('/password-reset/' + resetToken);
 	}
 
@@ -265,6 +265,34 @@ exports.postSignUp = (req, res) => {
 	const email = req.body.email;
 	const password = req.body.password;
 	const passwordConfirmation = req.body.passwordConfirmation;
+
+	//? Creates a validation class and checks for name length
+	const nameValidation = new Valid({ name: name }, { name: 'required|min:2' });
+	if (nameValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('register', 'Please use a valid name.');
+		return res.redirect('/register');
+	}
+	//? Creates a validation class and checks for email compatibility
+	const emailValidation = new Valid({ email: email }, { email: 'required|email' });
+	if (emailValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('register', 'Please use a valid email to sign up.');
+		return res.redirect('/register');
+	}
+	//? Creates a validation class and checks for password length and
+	//? returns a failure as true if smaller than 8 chars
+	const passwordValidation = new Valid({ password: password }, { password: 'required|string|min:8' });
+	if (passwordValidation.fails()) {
+		//? Properly creates the error message and reload the page
+		req.flash('register', 'Your passwords are required to be at least 8 characters long.');
+		return res.redirect('/register');
+	}
+	if (password !== passwordConfirmation) {
+		req.flash('register', 'Your passwords do not match!');
+		return res.redirect('/register');
+	}
+
 	//? Looks up if there is an user with this email
 	User.findOne({ email: email })
 		.then((user) => {
@@ -272,10 +300,8 @@ exports.postSignUp = (req, res) => {
 			if (user) {
 				req.flash('register', 'An account already exists with this email!');
 				throw Error('This user already exists!');
-			} else if (password !== passwordConfirmation) {
-				req.flash('register', 'Your passwords do not match!');
-				throw Error('Passwords do not match!');
 			}
+
 			//? If this user doesn't exist yet, proceed forward creating this account
 			return bcrypt
 				.hash(password, 12)
