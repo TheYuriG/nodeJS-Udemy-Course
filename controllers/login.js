@@ -274,6 +274,7 @@ exports.getSignUp = (req, res) => {
 		pageTitle: 'Create your account',
 		registerError: flashMessage(req.flash('register')), //? Adds error message, if any
 		success: flashMessage(req.flash('success')), //? Adds success message, if any
+		data: { name: '', email: '', password: '', passwordConfirmation: '' }, //? passes dummy data to render no pre-rendered text, unlike the errors
 	});
 };
 
@@ -284,19 +285,29 @@ exports.postSignUp = (req, res) => {
 	const password = req.body.password;
 	const passwordConfirmation = req.body.passwordConfirmation;
 
+	function rerender() {
+		res.status(422).render('auth/register', {
+			path: '/register',
+			pageTitle: 'Create your account',
+			registerError: flashMessage(req.flash('register')), //? Adds error message, if any
+			success: flashMessage(req.flash('success')), //? Adds success message, if any
+			data: { name: name, email: email, password: password, passwordConfirmation: passwordConfirmation },
+		});
+	}
+
 	//? Creates a validation class and checks for name length
 	const nameValidation = new Valid({ name: name }, { name: 'required|min:2' });
 	if (nameValidation.fails()) {
 		//? Properly creates the error message and reload the page
 		req.flash('register', 'Please use a valid name.');
-		return res.redirect('/register');
+		return rerender();
 	}
 	//? Creates a validation class and checks for email compatibility
 	const emailValidation = new Valid({ email: email }, { email: 'required|email' });
 	if (emailValidation.fails()) {
 		//? Properly creates the error message and reload the page
 		req.flash('register', 'Please use a valid email to sign up.');
-		return res.redirect('/register');
+		return rerender();
 	}
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
@@ -304,11 +315,11 @@ exports.postSignUp = (req, res) => {
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message and reload the page
 		req.flash('register', 'Your passwords are required to be at least 8 characters long.');
-		return res.redirect('/register');
+		return rerender();
 	}
 	if (password !== passwordConfirmation) {
 		req.flash('register', 'Your passwords do not match!');
-		return res.redirect('/register');
+		return rerender();
 	}
 
 	//? Looks up if there is an user with this email
@@ -317,7 +328,7 @@ exports.postSignUp = (req, res) => {
 			//? If this user exists, errors out to avoid duplicated data
 			if (user) {
 				req.flash('register', 'An account already exists with this email!');
-				throw Error('This user already exists!');
+				return rerender();
 			}
 
 			//? If this user doesn't exist yet, proceed forward creating this account
@@ -332,15 +343,16 @@ exports.postSignUp = (req, res) => {
 					//? After creating the account, redirect to main page
 					res.redirect('/authenticate');
 					//? and then log in and send an email confirming account
-					return transporter.sendMail({
-						to: email, //? email of the created account
-						from: senderEmail, //? email validated in SendGrid
-						subject: `Hello, ${name}! Your account has been created at Shop!`,
-						html: '<h1>Congratulations</h1><p>You can now spend billions on our store</p>',
-					});
+					return transporter
+						.sendMail({
+							to: email, //? email of the created account
+							from: senderEmail, //? email validated in SendGrid
+							subject: `Hello, ${name}! Your account has been created at Shop!`,
+							html: '<h1>Congratulations</h1><p>You can now spend billions on our store</p>',
+						})
+						.then(() => console.log('Email sent successfully!'));
 				});
 		})
-		.then(() => console.log('Email sent successfully!'))
 		.catch((e) => {
 			console.error(e);
 			res.redirect('/register');
