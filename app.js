@@ -30,7 +30,6 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authenticationRoutes = require('./routes/auth');
-const User = require('./models/user');
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
