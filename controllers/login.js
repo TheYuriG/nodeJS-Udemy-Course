@@ -94,7 +94,7 @@ exports.postLogin = (req, res) => {
 	User.findOne({ email: postLoginEmail }).then((user) => {
 		if (!user) {
 			req.flash('authenticateEmail', 'There is no account with this email!');
-			return res.redirect('/authenticate');
+			return rerender();
 		}
 		bcrypt
 			.compare(postLoginPassword, user.password)
@@ -110,13 +110,13 @@ exports.postLogin = (req, res) => {
 						res.redirect('/');
 					});
 				}
-				req.flash('auth', "Passwords doesn't match!");
-				return res.redirect('/authenticate');
+				req.flash('authenticatePassword', "Passwords doesn't match!");
+				return rerender();
 			})
 			.catch((e) => {
 				console.log(e);
 				req.flash('authenticateEmail', 'An undefined error happened, please contact the system admnistrator!');
-				return res.redirect('/authenticate');
+				return rerender();
 			});
 	});
 };
