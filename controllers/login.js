@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const mailer = require('nodemailer');
 const senderGrid = require('nodemailer-sendgrid-transport');
 const Valid = require('validatorjs');
+const clean = require('string-sanitizer');
 
 //? Imports the User model so the User model is attached to every request.session
 const User = require('../models/user');
@@ -50,7 +51,7 @@ exports.getLogin = (req, res) => {
 
 //? Processes the login request from the client at "/authenticate"
 exports.postLogin = (req, res) => {
-	const postLoginEmail = req.body.email;
+	const postLoginEmail = clean.removeSpace(req.body.email);
 	const postLoginPassword = req.body.password;
 	let errorNum = 0;
 
@@ -143,7 +144,7 @@ exports.getPasswordReset = (req, res) => {
 //? Handles the request when clicking on "Reset Password" at
 //? "/forgot-password", which is a POST request to "/send-me-new-password"
 exports.postPasswordReset = (req, res) => {
-	const postLoginEmail = req.body.email;
+	const postLoginEmail = clean.removeSpace(req.body.email);
 
 	crypto.randomBytes(32, (err, buffer) => {
 		if (err) {
@@ -304,7 +305,7 @@ exports.getSignUp = (req, res) => {
 exports.postSignUp = (req, res) => {
 	//? Data the user put in the form
 	const name = req.body.name;
-	const email = req.body.email;
+	const email = clean.removeSpace(req.body.email);
 	const password = req.body.password;
 	const passwordConfirmation = req.body.passwordConfirmation;
 	//? A number that stores the quantity of errors to know if it's necessary
