@@ -6,7 +6,7 @@
 }
 
 .user-message {
-	margin: auto;
+	margin: 0.5rem auto;
 	width: 50%;
 	border: 1px solid blue;
 	padding: 0.5rem;
@@ -17,8 +17,8 @@
 
 .user-message--error {
 	border-color: red;
-	background: rgb(255, 176, 176);
-	color: red;
+	background: rgb(255, 216, 216);
+	color: rgb(228, 0, 0);
 }
 
 .user-message--success {
