@@ -284,12 +284,15 @@ exports.postSignUp = (req, res) => {
 	const email = req.body.email;
 	const password = req.body.password;
 	const passwordConfirmation = req.body.passwordConfirmation;
+	let errorNum = 0;
 
 	function rerender() {
 		res.status(422).render('auth/register', {
 			path: '/register',
 			pageTitle: 'Create your account',
-			registerError: flashMessage(req.flash('register')), //? Adds error message, if any
+			registerErrorEmail: flashMessage(req.flash('registerEmail')), //? Adds error message, if any
+			registerErrorName: flashMessage(req.flash('registerName')), //? Adds error message, if any
+			registerErrorPassword: flashMessage(req.flash('registerPassword')), //? Adds error message, if any
 			success: flashMessage(req.flash('success')), //? Adds success message, if any
 			data: { name: name, email: email, password: password, passwordConfirmation: passwordConfirmation },
 		});
@@ -299,26 +302,29 @@ exports.postSignUp = (req, res) => {
 	const nameValidation = new Valid({ name: name }, { name: 'required|min:2' });
 	if (nameValidation.fails()) {
 		//? Properly creates the error message and reload the page
-		req.flash('register', 'Please use a valid name.');
-		return rerender();
+		req.flash('registerName', 'Please use a valid name.');
+		errorNum++;
 	}
 	//? Creates a validation class and checks for email compatibility
 	const emailValidation = new Valid({ email: email }, { email: 'required|email' });
 	if (emailValidation.fails()) {
 		//? Properly creates the error message and reload the page
-		req.flash('register', 'Please use a valid email to sign up.');
-		return rerender();
+		req.flash('registerEmail', 'Please use a valid email to sign up.');
+		errorNum++;
 	}
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
 	const passwordValidation = new Valid({ password: password }, { password: 'required|string|min:8' });
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message and reload the page
-		req.flash('register', 'Your passwords are required to be at least 8 characters long.');
-		return rerender();
+		req.flash('registerPassword', 'Your passwords are required to be at least 8 characters long.');
+		errorNum++;
 	}
 	if (password !== passwordConfirmation) {
-		req.flash('register', 'Your passwords do not match!');
+		req.flash('registerPassword', 'Your passwords do not match!');
+		errorNum++;
+	}
+	if (errorNum > 0) {
 		return rerender();
 	}
 
@@ -327,7 +333,7 @@ exports.postSignUp = (req, res) => {
 		.then((user) => {
 			//? If this user exists, errors out to avoid duplicated data
 			if (user) {
-				req.flash('register', 'An account already exists with this email!');
+				req.flash('registerEmail', 'An account already exists with this email!');
 				return rerender();
 			}
 

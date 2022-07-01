@@ -7,27 +7,34 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main>
-    <% if (registerError != undefined) { %>
-    <div class="user-message user-message--error"><%= registerError %></div>
-    <% } else if (success != undefined) { %>
+    <% if (registerErrorName != undefined) { %>
+    <div class="user-message user-message--error"><%= registerErrorName %></div>
+    <% } %>
+    <% if (registerErrorEmail != undefined) { %>
+    <div class="user-message user-message--error"><%= registerErrorEmail %></div>
+    <% } %>
+    <% if (registerErrorPassword != undefined) { %>
+    <div class="user-message user-message--error"><%= registerErrorPassword %></div>
+    <% } %>
+    <% if (success != undefined) { %>
     <div class="user-message user-message--success"><%= success %></div>
     <% } %>
     <form class="login-form" action="/new-account" method="POST">
       <div class="form-control">
         <label for="name">Name</label>
-        <input type="name" name="name" value="<%= data.name %>" id="name">
+        <input class="<%= registerErrorName ? "invalid" : "" %>" type="name" name="name" value="<%= data.name %>" id="name">
       </div>
       <div class="form-control">
         <label for="email">Email</label>
-        <input type="email" name="email" value="<%= data.email %>" id="email">
+        <input class="<%= registerErrorEmail ? "invalid" : "" %>" type="email" name="email" value="<%= data.email %>" id="email">
       </div>
       <div class="form-control">
         <label for="password">Password</label>
-        <input type="password" name="password" value="<%= data.password %>" id="password">
+        <input class="<%= registerErrorPassword ? "invalid" : "" %>" type="password" name="password" value="<%= data.password %>" id="password">
       </div>
       <div class="form-control">
         <label for="confirm-password">Confirm Password</label>
-        <input type="password" name="passwordConfirmation" value="<%= data.passwordConfirmation %>" id="password">
+        <input class="<%= registerErrorPassword ? "invalid" : "" %>" type="password" name="passwordConfirmation" value="<%= data.passwordConfirmation %>" id="password">
       </div>
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn" type="submit">Register</button>
