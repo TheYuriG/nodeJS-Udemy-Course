@@ -280,12 +280,16 @@ exports.getSignUp = (req, res) => {
 
 //? Loads the sign up page
 exports.postSignUp = (req, res) => {
+	//? Data the user put in the form
 	const name = req.body.name;
 	const email = req.body.email;
 	const password = req.body.password;
 	const passwordConfirmation = req.body.passwordConfirmation;
+	//? A number that stores the quantity of errors to know if it's necessary
+	//? to reload the page or not
 	let errorNum = 0;
 
+	//? Simple function to simplify rendering the registering page again
 	function rerender() {
 		res.status(422).render('auth/register', {
 			path: '/register',
@@ -294,36 +298,42 @@ exports.postSignUp = (req, res) => {
 			registerErrorName: flashMessage(req.flash('registerName')), //? Adds error message, if any
 			registerErrorPassword: flashMessage(req.flash('registerPassword')), //? Adds error message, if any
 			success: flashMessage(req.flash('success')), //? Adds success message, if any
-			data: { name: name, email: email, password: password, passwordConfirmation: passwordConfirmation },
+			data: { name: name, email: email, password: password, passwordConfirmation: passwordConfirmation }, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
 
 	//? Creates a validation class and checks for name length
 	const nameValidation = new Valid({ name: name }, { name: 'required|min:2' });
 	if (nameValidation.fails()) {
-		//? Properly creates the error message and reload the page
+		//? Properly creates the error message
 		req.flash('registerName', 'Please use a valid name.');
+		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
 	//? Creates a validation class and checks for email compatibility
 	const emailValidation = new Valid({ email: email }, { email: 'required|email' });
 	if (emailValidation.fails()) {
-		//? Properly creates the error message and reload the page
+		//? Properly creates the error message
 		req.flash('registerEmail', 'Please use a valid email to sign up.');
+		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
 	const passwordValidation = new Valid({ password: password }, { password: 'required|string|min:8' });
 	if (passwordValidation.fails()) {
-		//? Properly creates the error message and reload the page
+		//? Properly creates the error message
 		req.flash('registerPassword', 'Your passwords are required to be at least 8 characters long.');
+		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
+	//? Checks if the password and confirmation match
 	if (password !== passwordConfirmation) {
 		req.flash('registerPassword', 'Your passwords do not match!');
+		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
+	//? If any errors happened, reload the register page with them
 	if (errorNum > 0) {
 		return rerender();
 	}
@@ -361,6 +371,7 @@ exports.postSignUp = (req, res) => {
 		})
 		.catch((e) => {
 			console.error(e);
+			req.flash('registerEmail', 'An undefined error happened, please contact the system admnistrator!');
 			res.redirect('/register');
 		});
 };
