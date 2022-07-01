@@ -41,8 +41,10 @@ exports.getLogin = (req, res) => {
 	res.render('auth/authenticate', {
 		path: '/authenticate',
 		pageTitle: 'Log in your account now!',
-		authError: flashMessage(req.flash('auth')), //? Adds error message, if any
+		authenticateErrorEmail: flashMessage(req.flash('authenticateEmail')), //? Adds email error message, if any
+		authenticateErrorPassword: flashMessage(req.flash('authenticatePassword')), //? Adds password error message, if any
 		success: flashMessage(req.flash('success')), //? Adds success message, if any
+		data: { email: '', password: '' }, //? passes dummy data to render no pre-rendered text, unlike the errors
 	});
 };
 
@@ -50,29 +52,48 @@ exports.getLogin = (req, res) => {
 exports.postLogin = (req, res) => {
 	const postLoginEmail = req.body.email;
 	const postLoginPassword = req.body.password;
+	let errorNum = 0;
+
+	function rerender() {
+		res.status(422).render('auth/authenticate', {
+			path: '/authenticate',
+			pageTitle: 'Log in your account now!',
+			authenticateErrorEmail: flashMessage(req.flash('authenticateEmail')), //? Adds error message, if any
+			authenticateErrorPassword: flashMessage(req.flash('authenticatePassword')), //? Adds error message, if any
+			success: flashMessage(req.flash('success')), //? Adds success message, if any
+			data: { email: postLoginEmail, password: postLoginPassword }, //? passes back the data that the user tried to input, but ended up failing
+		});
+	}
 
 	//? Creates a validation class and checks for email compatibility
 	const emailValidation = new Valid({ email: postLoginEmail }, { email: 'required|email' });
 	if (emailValidation.fails()) {
-		//? Properly creates the error message and reload the page
-		req.flash('auth', 'Please use a valid email to sign in.');
-		return res.redirect('/authenticate');
+		//? Properly creates the error message
+		req.flash('authenticateEmail', 'Please use a valid email to sign in.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
 	}
 
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
 	const passwordValidation = new Valid({ password: postLoginPassword }, { password: 'required|string|min:8' });
 	if (passwordValidation.fails()) {
-		//? Properly creates the error message and reload the page
-		req.flash('auth', 'Your passwords are required to be at least 8 characters long.');
-		return res.redirect('/authenticate');
+		//? Properly creates the error message
+		req.flash('authenticatePassword', 'Your passwords are required to be at least 8 characters long.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+
+	//? If any errors happened, reload the register page with them
+	if (errorNum > 0) {
+		return rerender();
 	}
 
 	//? Pulls the data from the User model for this user and then
 	//? attach this data to req.session for usage in further requests
 	User.findOne({ email: postLoginEmail }).then((user) => {
 		if (!user) {
-			req.flash('auth', 'There is no account with this email!');
+			req.flash('authenticateEmail', 'There is no account with this email!');
 			return res.redirect('/authenticate');
 		}
 		bcrypt
@@ -94,6 +115,7 @@ exports.postLogin = (req, res) => {
 			})
 			.catch((e) => {
 				console.log(e);
+				req.flash('authenticateEmail', 'An undefined error happened, please contact the system admnistrator!');
 				return res.redirect('/authenticate');
 			});
 	});
