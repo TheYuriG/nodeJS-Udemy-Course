@@ -1,4 +1,15 @@
 const Product = require('../models/product');
+const Valid = require('validatorjs');
+
+//? Helper function to return the flash content of a request but
+//? will return null if there is no message flashed
+function flashMessage(flash) {
+	let message = flash;
+	if (message.length > 0) {
+		return message[0];
+	}
+	return null;
+}
 
 //? Loads the blank page to add a new product rather than editing an old one
 exports.getAddProduct = (req, res) => {
@@ -6,6 +17,10 @@ exports.getAddProduct = (req, res) => {
 		pageTitle: 'Add Product',
 		path: '/admin/add-product',
 		editing: false,
+		newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+		newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+		newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+		newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 	});
 };
 
@@ -16,6 +31,58 @@ exports.postAddProduct = (req, res) => {
 	const imageUrl = req.body.imageUrl;
 	const price = req.body.price;
 	const description = req.body.description;
+	let errorNum = 0;
+
+	//? Simple function to simplify rendering the registering page again
+	function rerender() {
+		res.status(422).render('admin/edit-product', {
+			pageTitle: 'Add Product',
+			path: '/admin/add-product',
+			editing: true,
+			newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+			newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+			newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+			query: { title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
+		});
+	}
+
+	//? Creates a validation class and checks for title length
+	const titleValidation = new Valid({ title: title }, { title: 'required|min:3' });
+	if (titleValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerTitle', 'Please use a valid title.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for imageUrl compatibility
+	const imageUrlValidation = new Valid({ imageUrl: imageUrl }, { imageUrl: 'required|url' });
+	if (imageUrlValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerImageUrl', 'Please use a valid email to sign up.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for price being numeric
+	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
+	if (priceValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerPrice', 'Your passwords are required to be at least 8 characters long.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for description length
+	const descriptionValidation = new Valid({ description: description }, { description: 'required|min:5' });
+	if (descriptionValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerDescription', 'Please use a valid description.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? If any errors happened, reload the register page with them
+	if (errorNum > 0) {
+		return rerender();
+	}
 
 	//? Create a product with that data
 	const product = new Product({

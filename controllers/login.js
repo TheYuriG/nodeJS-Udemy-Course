@@ -116,7 +116,7 @@ exports.postLogin = (req, res) => {
 			})
 			.catch((e) => {
 				console.log(e);
-				req.flash('authenticateEmail', 'An undefined error happened, please contact the system admnistrator!');
+				req.flash('authenticateEmail', 'An undefined error happened, please contact the system administrator!');
 				return rerender();
 			});
 	});
@@ -394,7 +394,7 @@ exports.postSignUp = (req, res) => {
 		})
 		.catch((e) => {
 			console.error(e);
-			req.flash('registerEmail', 'An undefined error happened, please contact the system admnistrator!');
+			req.flash('registerEmail', 'An undefined error happened, please contact the system administrator!');
 			res.redirect('/register');
 		});
 };

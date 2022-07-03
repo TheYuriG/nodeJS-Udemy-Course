@@ -7,6 +7,18 @@
   <%- include('../includes/navigation.ejs') %>
 
   <main>
+    <% if (newProductErrorTitle != undefined) { %>
+    <div class="user-message user-message--error"><%= newProductErrorTitle %></div>
+    <% } %>
+    <% if (newProductErrorImageUrl != undefined) { %>
+    <div class="user-message user-message--error"><%= newProductErrorImageUrl %></div>
+    <% } %>
+    <% if (newProductErrorPrice != undefined) { %>
+    <div class="user-message user-message--error"><%= newProductErrorPrice %></div>
+    <% } %>
+    <% if (newProductErrorDescription != undefined) { %>
+    <div class="user-message user-message--error"><%= newProductErrorDescription %></div>
+    <% } %>
     <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<%} %>" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div class="form-control">
