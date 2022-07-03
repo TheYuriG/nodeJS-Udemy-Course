@@ -295,7 +295,10 @@ exports.getSignUp = (req, res) => {
 	res.render('auth/register', {
 		path: '/register',
 		pageTitle: 'Create your account',
-		registerError: flashMessage(req.flash('register')), //? Adds error message, if any
+
+		registerErrorEmail: flashMessage(req.flash('registerEmail')), //? Adds error message, if any
+		registerErrorName: flashMessage(req.flash('registerName')), //? Adds error message, if any
+		registerErrorPassword: flashMessage(req.flash('registerPassword')), //? Adds error message, if any
 		success: flashMessage(req.flash('success')), //? Adds success message, if any
 		data: { name: '', email: '', password: '', passwordConfirmation: '' }, //? passes dummy data to render no pre-rendered text, unlike the errors
 	});
