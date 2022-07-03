@@ -21,6 +21,7 @@ exports.getAddProduct = (req, res) => {
 		newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
 		newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
 		newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+		query: { title: '', imageUrl: '', price: '', description: '' }, //? dummy data
 	});
 };
 
@@ -38,7 +39,7 @@ exports.postAddProduct = (req, res) => {
 		res.status(422).render('admin/edit-product', {
 			pageTitle: 'Add Product',
 			path: '/admin/add-product',
-			editing: true,
+			editing: false,
 			newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
 			newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
 			newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
@@ -59,7 +60,7 @@ exports.postAddProduct = (req, res) => {
 	const imageUrlValidation = new Valid({ imageUrl: imageUrl }, { imageUrl: 'required|url' });
 	if (imageUrlValidation.fails()) {
 		//? Properly creates the error message
-		req.flash('registerImageUrl', 'Please use a valid email to sign up.');
+		req.flash('registerImageUrl', 'Please use a valid image URL to add this product.');
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
@@ -67,7 +68,7 @@ exports.postAddProduct = (req, res) => {
 	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
 	if (priceValidation.fails()) {
 		//? Properly creates the error message
-		req.flash('registerPrice', 'Your passwords are required to be at least 8 characters long.');
+		req.flash('registerPrice', 'The price for this item needs to be a valid number.');
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
