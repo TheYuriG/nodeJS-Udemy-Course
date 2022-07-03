@@ -139,6 +139,10 @@ exports.getEditProduct = (req, res) => {
 				pageTitle: 'Edit Product',
 				path: '/admin/edit-product',
 				editing: editMode,
+				newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+				newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+				newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+				newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 				query: req.query,
 			});
 		})
@@ -156,6 +160,58 @@ exports.postEditProduct = (req, res) => {
 	let imageUrl = req.body.imageUrl;
 	let price = req.body.price;
 	let description = req.body.description;
+	let errorNum = 0;
+
+	//? Simple function to simplify rendering the registering page again
+	function rerender() {
+		res.status(422).render('admin/edit-product', {
+			pageTitle: 'Edit Product',
+			path: '/admin/edit-product',
+			editing: true,
+			newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+			newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+			newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+			query: { id: id, title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
+		});
+	}
+
+	//? Creates a validation class and checks for title length
+	const titleValidation = new Valid({ title: title }, { title: 'required|min:3' });
+	if (titleValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerTitle', 'Please use a valid title.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for imageUrl compatibility
+	const imageUrlValidation = new Valid({ imageUrl: imageUrl }, { imageUrl: 'required|url' });
+	if (imageUrlValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerImageUrl', 'Please use a valid image URL to add this product.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for price being numeric
+	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
+	if (priceValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerPrice', 'The price for this item needs to be a valid number.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? Creates a validation class and checks for description length
+	const descriptionValidation = new Valid({ description: description }, { description: 'required|min:5' });
+	if (descriptionValidation.fails()) {
+		//? Properly creates the error message
+		req.flash('registerDescription', 'Please use a valid description.');
+		//? Increase the error counter to reload the page after all checks
+		errorNum++;
+	}
+	//? If any errors happened, reload the register page with them
+	if (errorNum > 0) {
+		return rerender();
+	}
 
 	//? Look up the old data of this product in the database
 	Product.findById(id)
