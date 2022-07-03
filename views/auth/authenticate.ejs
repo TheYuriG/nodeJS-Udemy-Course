@@ -19,11 +19,11 @@
     <form class="login-form" action="/login-attempt" method="POST">
       <div class="form-control">
         <label for="email">Email</label>
-        <input class="<%= authenticateErrorEmail ? "invalid" : "" %>" type="email" name="email" value="<%= data.email %>" id="email">
+        <input class="<%= authenticateErrorEmail ? 'invalid' : '' %>" type="email" name="email" value="<%= data.email %>" id="email">
       </div>
       <div class="form-control">
         <label for="password">Password</label>
-        <input class="<%= authenticateErrorPassword ? "invalid" : "" %>" type="password" name="password" value="<%= data.password %>" id="password">
+        <input class="<%= authenticateErrorPassword ? 'invalid' : '' %>" type="password" name="password" value="<%= data.password %>" id="password">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       </div>
       <button class="btn" type="submit">Login

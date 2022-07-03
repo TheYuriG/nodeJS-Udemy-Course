@@ -26,6 +26,10 @@
 	border-color: red;
 }
 
+.form-control textarea.invalid {
+	border-color: red;
+}
+
 .user-message {
 	margin: 0.5rem auto;
 	width: 50%;

@@ -17,10 +17,10 @@ exports.getAddProduct = (req, res) => {
 		pageTitle: 'Add Product',
 		path: '/admin/add-product',
 		editing: false,
-		newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-		newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
-		newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
-		newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+		productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+		productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+		productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+		productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 		query: { title: '', imageUrl: '', price: '', description: '' }, //? dummy data
 	});
 };
@@ -40,10 +40,10 @@ exports.postAddProduct = (req, res) => {
 			pageTitle: 'Add Product',
 			path: '/admin/add-product',
 			editing: false,
-			newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-			newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
-			newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
-			newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+			productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+			productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+			productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 			query: { title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
@@ -139,10 +139,10 @@ exports.getEditProduct = (req, res) => {
 				pageTitle: 'Edit Product',
 				path: '/admin/edit-product',
 				editing: editMode,
-				newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-				newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
-				newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
-				newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+				productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+				productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+				productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+				productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 				query: req.query,
 			});
 		})
@@ -168,10 +168,10 @@ exports.postEditProduct = (req, res) => {
 			pageTitle: 'Edit Product',
 			path: '/admin/edit-product',
 			editing: true,
-			newProductErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-			newProductErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
-			newProductErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
-			newProductErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
+			productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
+			productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
+			productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 			query: { id: id, title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
