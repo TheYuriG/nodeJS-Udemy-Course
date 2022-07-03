@@ -60,12 +60,17 @@ app.use((req, res, next) => {
 //? if they failed to sign in or sign up
 app.use(flashData());
 
-//? Only start the routes after the bodyparser has been made available and
+//? Only start the routes after the body-parser has been made available and
 //? the CSS files are made public
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authenticationRoutes);
+app.get('/500', errorController.get500);
 app.use(errorController.get404);
+app.use((error, req, res, next) => {
+	// res.status(error.httpStatusCode).render(...)
+	res.redirect('/500');
+});
 
 mongoose
 	.connect(mongoDBAPIKey)

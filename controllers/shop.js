@@ -2,7 +2,7 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const User = require('../models/user');
 
-exports.getProducts = (req, res) => {
+exports.getProducts = (req, res, next) => {
 	Product.find()
 		.then((products) => {
 			res.render('shop/product-list', {
@@ -11,14 +11,15 @@ exports.getProducts = (req, res) => {
 				prods: products,
 			});
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Controller for individual item details
-exports.getProductDetail = (req, res) => {
+exports.getProductDetail = (req, res, next) => {
 	Product.findById(req.params.productId)
 		.then((product) => {
 			res.render('shop/product-detail', {
@@ -27,13 +28,14 @@ exports.getProductDetail = (req, res) => {
 				path: '/products',
 			});
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
-exports.getIndex = (req, res) => {
+exports.getIndex = (req, res, next) => {
 	Product.find()
 		.then((products) => {
 			res.render('shop/index', {
@@ -42,14 +44,15 @@ exports.getIndex = (req, res) => {
 				path: '/',
 			});
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Method to pull all cart items and then use their data
-exports.getCart = (req, res) => {
+exports.getCart = (req, res, next) => {
 	User.findById(req.session.user._id)
 		.then((user) => {
 			user.getCart().then((cartItemsArray) => {
@@ -65,14 +68,15 @@ exports.getCart = (req, res) => {
 				});
 			});
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
-exports.postCart = (req, res) => {
+exports.postCart = (req, res, next) => {
 	const productoId = req.body.producto;
 	Product.findById(productoId)
 		.then((product) => {
@@ -81,14 +85,15 @@ exports.postCart = (req, res) => {
 		.then(() => {
 			res.redirect('/cart');
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Handles the POST request when clicking the "Delete" in /cart
-exports.postCartDeletion = (req, res) => {
+exports.postCartDeletion = (req, res, next) => {
 	//? Fetches the product id that is meant to be deleted
 	const productoId = req.body.idOfItemToBeDeleted;
 	//? After the cartItem product instance, redirect the user to the cart
@@ -98,11 +103,15 @@ exports.postCartDeletion = (req, res) => {
 		.then(() => {
 			res.redirect('/cart');
 		})
-		.catch((error) => console.log(error));
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
 };
 
 //? Pulls the Order data and then pass it into the view to be rendered properly
-exports.getOrders = (req, res) => {
+exports.getOrders = (req, res, next) => {
 	//? Search through all orders and retrieve the ones that
 	//? has userId === this user's ID
 	Order.find({ userId: req.session.user._id })
@@ -114,14 +123,15 @@ exports.getOrders = (req, res) => {
 				orders: orderino == null ? [] : orderino, //? Gives back an empty array if no orders were found
 			});
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Handles the POST request when proceeding to checkout from cart
-exports.postOrders = (req, res) => {
+exports.postOrders = (req, res, next) => {
 	//? Parse the order object passed as JSON upon clicking "Order now!" at /cart
 	let parsedOrder = JSON.parse(req.body.cartToOrder);
 
@@ -159,13 +169,14 @@ exports.postOrders = (req, res) => {
 			//? redirect the user to the orders page and display the orders
 			res.redirect('/orders');
 		})
-		.catch((e) => {
-			console.log(e);
-			res.redirect('/404');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
-// exports.getCheckout = (req, res) => {
+// exports.getCheckout = (req, res, next) => {
 // 	const loginData = req.session.isAuthenticated ? true : false;
 // 	res.render('shop/checkout', {
 // 		path: '/checkout',

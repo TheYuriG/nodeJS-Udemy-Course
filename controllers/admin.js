@@ -26,7 +26,7 @@ exports.getAddProduct = (req, res) => {
 };
 
 //? Processes the data request of adding a product
-exports.postAddProduct = (req, res) => {
+exports.postAddProduct = (req, res, next) => {
 	//? Grabs all data from the request body
 	const title = req.body.title;
 	const imageUrl = req.body.imageUrl;
@@ -102,7 +102,11 @@ exports.postAddProduct = (req, res) => {
 			console.log('Product has been created');
 			res.redirect('/admin/products');
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
 };
 
 //? Fills the forms with data of a given product and allows editing it
@@ -153,7 +157,7 @@ exports.getEditProduct = (req, res) => {
 };
 
 // ? Processes the data request of adding a product
-exports.postEditProduct = (req, res) => {
+exports.postEditProduct = (req, res, next) => {
 	//? Pull all the sent data from the request body
 	const id = req.body.id;
 	let title = req.body.title;
@@ -233,13 +237,15 @@ exports.postEditProduct = (req, res) => {
 			//? Redirect the user
 			res.redirect('/admin/products');
 		})
-		.catch(() => {
-			console.log('error reaching database to pull this item data');
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
 		});
 };
 
 //? Processes the item deletion request from clicking "Delete" on /admin/products
-exports.deleteProduct = (req, res) => {
+exports.deleteProduct = (req, res, next) => {
 	//? Gets the ID of the item to be deleted through the POST request
 	const deletionID = req.params.productId;
 	Product.deleteOne({ _id: deletionID, userId: req.session.user._id })
@@ -248,12 +254,16 @@ exports.deleteProduct = (req, res) => {
 			//? now be missing the item you have just requested to delete
 			res.redirect('/admin/products');
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
 };
 
 //? Loads the page to view all products in admin mode (with edit) only for
 //? the user currently logged in (userId == 1)
-exports.getProducts = (req, res) => {
+exports.getProducts = (req, res, next) => {
 	Product.find({ userId: req.session.user._id })
 		//? Mongoose has helper functions that enable you to filter in and out
 		//? some specific data
@@ -276,5 +286,9 @@ exports.getProducts = (req, res) => {
 				path: '/admin/products',
 			});
 		})
-		.catch((e) => console.log(e));
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
 };
