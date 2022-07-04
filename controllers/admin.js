@@ -29,7 +29,7 @@ exports.getAddProduct = (req, res) => {
 exports.postAddProduct = (req, res, next) => {
 	//? Grabs all data from the request body
 	const title = req.body.title;
-	const imageUrl = req.body.imageUrl;
+	const image = req.file;
 	const price = req.body.price;
 	const description = req.body.description;
 	let errorNum = 0;
@@ -53,14 +53,6 @@ exports.postAddProduct = (req, res, next) => {
 	if (titleValidation.fails()) {
 		//? Properly creates the error message
 		req.flash('registerTitle', 'Please use a valid title.');
-		//? Increase the error counter to reload the page after all checks
-		errorNum++;
-	}
-	//? Creates a validation class and checks for imageUrl compatibility
-	const imageUrlValidation = new Valid({ imageUrl: imageUrl }, { imageUrl: 'required|url' });
-	if (imageUrlValidation.fails()) {
-		//? Properly creates the error message
-		req.flash('registerImageUrl', 'Please use a valid image URL to add this product.');
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
@@ -90,7 +82,7 @@ exports.postAddProduct = (req, res, next) => {
 		title: title,
 		price: price,
 		description: description,
-		imageUrl: imageUrl,
+		image: image,
 		userId: req.session.user._id,
 	});
 

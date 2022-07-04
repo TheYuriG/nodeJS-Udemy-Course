@@ -9,6 +9,17 @@ const session = require('express-session');
 const MongoSessionStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flashData = require('connect-flash');
+const multer = require('multer');
+
+//? Setup for configuring a file destination and name with multer
+const fileConfig = multer.diskStorage({
+	destination: (req, file, callback) => {
+		callback(null, 'images');
+	},
+	filename: (req, file, callback) => {
+		callback(null, new Date().toISOString() + '-' + file.originalname);
+	},
+});
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -33,6 +44,9 @@ const authenticationRoutes = require('./routes/auth');
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
+//? Parses requests where a form will send forms with "multipart/form-data"
+//? encoding type
+app.use(multer({ storage: fileConfig }).single('image'));
 //? Enables the css folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
 //? Adds the middleware for handling user sessions, set up the proper cookie,
