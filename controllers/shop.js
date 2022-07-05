@@ -185,17 +185,40 @@ exports.postOrders = (req, res, next) => {
 //? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrderInvoice = (req, res, next) => {
 	//? ID of this order
-	const invoiceId = req.params.invoiceId;
-	//? Name of the invoice file created upon completing an order
-	const invoiceFile = 'invoice-' + invoiceId + '.pdf';
-	//? Path direction to this PDF in the server
-	const invoicePath = path.join('invoices', invoiceFile);
-	fs.readFile(invoicePath, (invoiceReadFileError, loadedData) => {
-		if (invoiceReadFileError) {
-			return next(invoiceReadFileError);
-		}
-		res.send(loadedData);
-	});
+	const orderId = req.params.invoiceId;
+
+	//? Pulls data from this order to check if the order user is the same
+	//? as the logged in user
+	Order.findById(orderId)
+		.then((databaseFoundOrder) => {
+			//? If no order was found, error the user
+			if (!databaseFoundOrder) {
+				return next(new Error('No Order Found!'));
+			}
+			//? If the order user is different than the logged user, error the user
+			if (databaseFoundOrder.userId.toString() !== req.session.user._id.toString()) {
+				return next(new Error('Authorization error! Different user than request!'));
+			}
+
+			//? Name of the invoice file created upon completing an order
+			const invoiceFile = 'invoice-' + orderId + '.pdf';
+			//? Path direction to this PDF in the server
+			const invoicePath = path.join('invoices', invoiceFile);
+
+			//? Reads the file and serves it to the client
+			fs.readFile(invoicePath, (invoiceReadFileError, loadedData) => {
+				if (invoiceReadFileError) {
+					return next(invoiceReadFileError);
+				}
+				//? Defines the file as PDF
+				res.setHeader('ContentType', 'application/pdf');
+				//? "attachment" tells the browser to download the file (inline would open in a new tab)
+				//? "filename" defines the name and extension of the file for the user
+				res.setHeader('Content-Disposition', 'attachment; filename="' + invoiceFile + '"');
+				res.send(loadedData);
+			});
+		})
+		.catch((databaseOrderError) => next(databaseOrderError));
 };
 
 // exports.getCheckout = (req, res, next) => {
