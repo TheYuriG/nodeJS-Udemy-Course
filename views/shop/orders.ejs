@@ -30,7 +30,7 @@
           <% currentOrderPrice += +product.price * product.quantity %>
           <% }) %>
         </ul>
-        <h5>Total cost of this order: R$ <%= currentOrderPrice %> </h5>
+        <h5>Total cost of this order: R$ <%= currentOrderPrice %> <a href="/invoice/<%= item._id %>">Download invoice</a></h5>
         <hr>
       </li>
       <% }) %>

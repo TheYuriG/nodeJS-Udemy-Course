@@ -32,6 +32,7 @@ router.get('/orders', isAuth, shopController.getOrders);
 //? the "Order Now!" button in "/cart"
 router.post('/order-this-cart', isAuth, shopController.postOrders);
 
-// router.get('/checkout', shopController.getCheckout);
+//? Displays an invoice for a specific order in pdf format
+router.get('/invoice/:invoiceId', isAuth, shopController.getOrderInvoice);
 
 module.exports = router;

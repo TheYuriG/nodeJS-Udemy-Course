@@ -1,3 +1,8 @@
+//? Import core feature from NodeJS to upload invoices
+const fs = require('fs');
+const path = require('path');
+
+//? Imports the data models
 const Product = require('../models/product');
 const Order = require('../models/order');
 const User = require('../models/user');
@@ -35,6 +40,7 @@ exports.getProductDetail = (req, res, next) => {
 		});
 };
 
+//? Loads main page with products with pagination
 exports.getIndex = (req, res, next) => {
 	Product.find()
 		.then((products) => {
@@ -141,7 +147,7 @@ exports.postOrders = (req, res, next) => {
 		let itemObject = {};
 		itemObject.productId = orderItem.productId._id;
 		itemObject.title = orderItem.productId.title;
-		itemObject.imageUrl = orderItem.productId.imageUrl;
+		itemObject.imagePath = orderItem.productId.imagePath;
 		itemObject.price = orderItem.productId.price;
 		itemObject.description = orderItem.productId.description;
 		itemObject.quantity = orderItem.quantity;
@@ -174,6 +180,22 @@ exports.postOrders = (req, res, next) => {
 			error.httpStatusCode = 500;
 			return next(error);
 		});
+};
+
+//? Pulls the Order data and then pass it into the view to be rendered properly
+exports.getOrderInvoice = (req, res, next) => {
+	//? ID of this order
+	const invoiceId = req.params.invoiceId;
+	//? Name of the invoice file created upon completing an order
+	const invoiceFile = 'invoice-' + invoiceId + '.pdf';
+	//? Path direction to this PDF in the server
+	const invoicePath = path.join('invoices', invoiceFile);
+	fs.readFile(invoicePath, (invoiceReadFileError, loadedData) => {
+		if (invoiceReadFileError) {
+			return next(invoiceReadFileError);
+		}
+		res.send(loadedData);
+	});
 };
 
 // exports.getCheckout = (req, res, next) => {
