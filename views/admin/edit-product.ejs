@@ -10,8 +10,8 @@
     <% if (productErrorTitle != undefined) { %>
     <div class="user-message user-message--error"><%= productErrorTitle %></div>
     <% } %>
-    <% if (productErrorImageUrl != undefined) { %>
-    <div class="user-message user-message--error"><%= productErrorImageUrl %></div>
+    <% if (productErrorImagePath != undefined) { %>
+    <div class="user-message user-message--error"><%= productErrorImagePath %></div>
     <% } %>
     <% if (productErrorPrice != undefined) { %>
     <div class="user-message user-message--error"><%= productErrorPrice %></div>
@@ -27,12 +27,14 @@
       </div>
       <div class="form-control">
         <label for="image">Image URL</label>
-        <input class="<%= productErrorImageUrl ? 'invalid' : '' %>" type="file" name="image" id="image">
+        <input class="<%= productErrorImagePath ? 'invalid' : '' %>" type="file" name="image" id="image">
       </div>
-      <%# <div class="form-control">
-        <label for="imageUrl">Image URL</label>
-        <input class="<%= productErrorImageUrl ? 'invalid' : '' %>" type="text" name="imageUrl" id="imageUrl" value="<%= query.imageUrl %>">
-      </div> %>
+      <%# 
+      <div class="form-control">
+        <label for="imagePath">Image URL</label>
+        <input type="text" name="imagePath" id="imagePath">
+      </div>
+      %>
       <div class="form-control">
         <label for="price">Price</label>
         <input class="<%= productErrorPrice ? 'invalid' : '' %>" type="number" name="price" id="price" step="0.01" value="<%= query.price %>">
