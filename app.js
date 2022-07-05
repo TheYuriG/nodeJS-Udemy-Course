@@ -11,21 +11,13 @@ const csrf = require('csurf');
 const flashData = require('connect-flash');
 const multer = require('multer');
 
-//? Setup for configuring a file destination and name with multer
-const fileConfig = multer.diskStorage({
-	destination: (req, file, callback) => {
-		callback(null, 'images');
-	},
-	filename: (req, file, callback) => {
-		callback(null, new Date().toISOString() + '-' + file.originalname);
-	},
-});
-
 //? Project imports
 const errorController = require('./controllers/error');
 //? The key was voided and recreated and is now stored secretly in this
 //? folder that doesn't get synced to GitHub
 const { mongoDBAPIKey, saltSecret } = require('./util/secrets/keys');
+//? Configuration utilities for multer
+const { fileDestinationAndNaming, fileTypeFilter } = require('./util/multer-file-config');
 
 //? Starts express
 const app = express();
@@ -46,7 +38,7 @@ const authenticationRoutes = require('./routes/auth');
 app.use(bodyParser.urlencoded({ extended: false }));
 //? Parses requests where a form will send forms with "multipart/form-data"
 //? encoding type
-app.use(multer({ storage: fileConfig }).single('image'));
+app.use(multer({ storage: fileDestinationAndNaming, fileFilter: fileTypeFilter }).single('image'));
 //? Enables the css folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
 //? Adds the middleware for handling user sessions, set up the proper cookie,
