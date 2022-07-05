@@ -37,10 +37,12 @@ const authenticationRoutes = require('./routes/auth');
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
 //? Parses requests where a form will send forms with "multipart/form-data"
-//? encoding type
+//? encoding type, but will contain a single image
 app.use(multer({ storage: fileDestinationAndNaming, fileFilter: fileTypeFilter }).single('image'));
-//? Enables the css folders to be publicly accessed at any point
+//? Enables the css and image folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 //? Adds the middleware for handling user sessions, set up the proper cookie,
 //? reads it when needed and stores it in MongoDB to avoid a memory overflow
 //? that would happen if all sessions were allocated in memory
@@ -55,6 +57,7 @@ app.use(
 		//? the sessions, rather than allocating memory for hundreds of concurrent users
 	})
 );
+
 //? Sets up the csurf package to protect the website from CSRF attacks
 app.use(csrfProtection);
 app.use((req, res, next) => {
@@ -62,6 +65,7 @@ app.use((req, res, next) => {
 	res.locals.csrfToken = req.csrfToken();
 	next();
 });
+
 //? Store optional error data so we can provide valuable user feedback
 //? if they failed to sign in or sign up
 app.use(flashData());
@@ -71,13 +75,17 @@ app.use(flashData());
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authenticationRoutes);
+//? Handles server errors in general
 app.get('/500', errorController.get500);
-app.use(errorController.get404);
 app.use((error, req, res, next) => {
 	// res.status(error.httpStatusCode).render(...)
+	console.log(error);
 	res.redirect('/500');
 });
+//? Returns a 404 page if you can't find any other page
+app.use(errorController.get404);
 
+//? Initiates mongoose
 mongoose
 	.connect(mongoDBAPIKey)
 	.then(() => {

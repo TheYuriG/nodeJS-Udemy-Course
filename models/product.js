@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const schemaForProducts = new Schema({
 	title: { type: String, required: true }, //? All products need a title
 	price: { type: Number, required: true }, //? All products need a price
-	imageUrl: { type: String, required: true }, //? All products need an image
+	imagePath: { type: String, required: true }, //? All products need an image
 	description: { type: String, required: true }, //? All products need a description
 	userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, //? All products need a
 	//? userId that created them. We also need to link the userId to the User model

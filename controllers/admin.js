@@ -18,10 +18,10 @@ exports.getAddProduct = (req, res) => {
 		path: '/admin/add-product',
 		editing: false,
 		productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-		productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+		productErrorImagePath: flashMessage(req.flash('registerImagePath')), //? Adds error message, if any
 		productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
 		productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
-		query: { title: '', imageUrl: '', price: '', description: '' }, //? dummy data
+		query: { title: '', price: '', description: '' }, //? dummy data
 	});
 };
 
@@ -29,7 +29,7 @@ exports.getAddProduct = (req, res) => {
 exports.postAddProduct = (req, res, next) => {
 	//? Grabs all data from the request body
 	const title = req.body.title;
-	const image = req.file;
+	const imagePath = req.file;
 	const price = req.body.price;
 	const description = req.body.description;
 	let errorNum = 0;
@@ -41,10 +41,10 @@ exports.postAddProduct = (req, res, next) => {
 			path: '/admin/add-product',
 			editing: false,
 			productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-			productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			productErrorImagePath: flashMessage(req.flash('registerImagePath')), //? Adds error message, if any
 			productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
 			productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
-			query: { title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
+			query: { title: title, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
 
@@ -55,6 +55,12 @@ exports.postAddProduct = (req, res, next) => {
 		req.flash('registerTitle', 'Please use a valid title.');
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
+	}
+	//? Checks if an image was cached. If not, then either nothing was uploaded or
+	//? the user tried to upload the wrong format.
+	if (!imagePath) {
+		errorNum++;
+		req.flash('registerImagePath', 'No image uploaded. Formats accepted: "*.png", "*.jpg" and "*.jpeg".');
 	}
 	//? Creates a validation class and checks for price being numeric
 	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
@@ -82,7 +88,7 @@ exports.postAddProduct = (req, res, next) => {
 		title: title,
 		price: price,
 		description: description,
-		image: image,
+		imagePath: imagePath.path,
 		userId: req.session.user._id,
 	});
 
@@ -136,7 +142,7 @@ exports.getEditProduct = (req, res) => {
 				path: '/admin/edit-product',
 				editing: editMode,
 				productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-				productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+				productErrorImagePath: flashMessage(req.flash('registerImagePath')), //? Adds error message, if any
 				productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
 				productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
 				query: req.query,
@@ -153,7 +159,7 @@ exports.postEditProduct = (req, res, next) => {
 	//? Pull all the sent data from the request body
 	const id = req.body.id;
 	let title = req.body.title;
-	let imageUrl = req.body.imageUrl;
+	const imagePath = req.file;
 	let price = req.body.price;
 	let description = req.body.description;
 	let errorNum = 0;
@@ -165,10 +171,10 @@ exports.postEditProduct = (req, res, next) => {
 			path: '/admin/edit-product',
 			editing: true,
 			productErrorTitle: flashMessage(req.flash('registerTitle')), //? Adds error message, if any
-			productErrorImageUrl: flashMessage(req.flash('registerImageUrl')), //? Adds error message, if any
+			productErrorImagePath: flashMessage(req.flash('registerImagePath')), //? Adds error message, if any
 			productErrorPrice: flashMessage(req.flash('registerPrice')), //? Adds error message, if any
 			productErrorDescription: flashMessage(req.flash('registerDescription')), //? Adds error message, if any
-			query: { id: id, title: title, imageUrl: imageUrl, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
+			query: { id: id, title: title, price: price, description: description }, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
 
@@ -180,13 +186,11 @@ exports.postEditProduct = (req, res, next) => {
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
-	//? Creates a validation class and checks for imageUrl compatibility
-	const imageUrlValidation = new Valid({ imageUrl: imageUrl }, { imageUrl: 'required|url' });
-	if (imageUrlValidation.fails()) {
-		//? Properly creates the error message
-		req.flash('registerImageUrl', 'Please use a valid image URL to add this product.');
-		//? Increase the error counter to reload the page after all checks
+	//? Checks if an image was cached. If not, then either nothing was uploaded or
+	//? the user tried to upload the wrong format.
+	if (!imagePath) {
 		errorNum++;
+		req.flash('registerImagePath', 'No image uploaded. Formats accepted: "*.png", "*.jpg" and "*.jpeg".');
 	}
 	//? Creates a validation class and checks for price being numeric
 	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
@@ -220,7 +224,7 @@ exports.postEditProduct = (req, res, next) => {
 			product.title = title;
 			product.price = price;
 			product.description = description;
-			product.imageUrl = imageUrl;
+			product.imagePath = imagePath.path;
 
 			//? Save the updated product to the database
 			return product.save();

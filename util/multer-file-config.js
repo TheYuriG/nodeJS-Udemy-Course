@@ -7,7 +7,7 @@ module.exports.fileDestinationAndNaming = multer.diskStorage({
 		callbackToFileDestination(null, 'images');
 	},
 	filename: (req, fileToName, callbackToFileName) => {
-		callbackToFileName(null, new Date().toISOString() + '-' + fileToName.originalname);
+		callbackToFileName(null, Date.now() + '-' + fileToName.originalname);
 	},
 });
 

@@ -1,4 +1,4 @@
 node_modules
 util/secrets
 .vscode/settings.json
-.gitignore
+images
