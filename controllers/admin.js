@@ -1,5 +1,12 @@
+//? Import the Product mongoose model
 const Product = require('../models/product');
+
+//? Import validation NPM package
 const Valid = require('validatorjs');
+
+//? Import file deletion util package
+const { yeet } = require('../util/file-management');
+const { image } = require('pdfkit');
 
 //? Helper function to return the flash content of a request but
 //? will return null if there is no message flashed
@@ -186,12 +193,6 @@ exports.postEditProduct = (req, res, next) => {
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
-	//? Checks if an image was cached. If not, then either nothing was uploaded or
-	//? the user tried to upload the wrong format.
-	if (!imagePath) {
-		errorNum++;
-		req.flash('registerImagePath', 'No image uploaded. Formats accepted: "*.png", "*.jpg" and "*.jpeg".');
-	}
 	//? Creates a validation class and checks for price being numeric
 	const priceValidation = new Valid({ price: price }, { price: 'required|numeric' });
 	if (priceValidation.fails()) {
@@ -224,7 +225,13 @@ exports.postEditProduct = (req, res, next) => {
 			product.title = title;
 			product.price = price;
 			product.description = description;
-			product.imagePath = imagePath.path;
+			//? Checks if an image was cached. If not, then either nothing was uploaded or
+			//? the user tried to upload the wrong format. In both cases, don't update the
+			//? product image
+			if (imagePath && product.imagePath !== imagePath.path) {
+				yeet(product.imagePath);
+				product.imagePath = imagePath.path;
+			}
 
 			//? Save the updated product to the database
 			return product.save();
@@ -244,10 +251,23 @@ exports.postEditProduct = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
 	//? Gets the ID of the item to be deleted through the POST request
 	const deletionID = req.params.productId;
-	Product.deleteOne({ _id: deletionID, userId: req.session.user._id })
+
+	//? Looks up the product on the database
+	Product.findById(deletionID)
+		.then((product) => {
+			//? If the product doesn't exist, error out this request
+			if (!product) {
+				return next(new Error("Product not found, couldn't delete associated image."));
+			}
+			//? and if it exists, delete its related image before
+			//? removing said product from the database
+			yeet(product.imagePath);
+			return Product.deleteOne({ _id: deletionID, userId: req.session.user._id });
+		})
 		.then(() => {
-			//? Redirects (reloads) back to the same /admin/products page which will
-			//? now be missing the item you have just requested to delete
+			//? Redirects (reloads) back to the same /admin/products page
+			//? which should now be missing the item you have just
+			//? requested to delete
 			res.redirect('/admin/products');
 		})
 		.catch((err) => {
