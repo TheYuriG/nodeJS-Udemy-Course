@@ -214,45 +214,51 @@ exports.getOrderInvoice = (req, res, next) => {
 			//? "filename" defines the name and extension of the file for the user
 			res.setHeader('Content-Disposition', 'attachment; filename="' + invoiceFile + '"');
 
-			//? Creates a new PDF stream to save and send to client
-			const PDFdocument = new PDFer();
-			//? Save the PDF to the disk as it's being created
-			PDFdocument.pipe(fs.createWriteStream(invoicePath));
-			//? Also send the PDF to the client as it's being created
-			PDFdocument.pipe(res);
+			//? Check if the PDF exists before sending it to the client
+			fs.access(invoicePath, fs.F_OK, (err) => {
+				if (err) {
+					//? Creates a new PDF stream to save and send to client
+					const PDFdocument = new PDFer();
+					//? Save the PDF to the disk as it's being created
+					PDFdocument.pipe(fs.createWriteStream(invoicePath));
+					//? Also send the PDF to the client as it's being created
+					PDFdocument.pipe(res);
 
-			PDFdocument.fontSize(26).text('Invoice', { underline: true });
-			PDFdocument.fontSize(14).text('-----------------------');
+					PDFdocument.fontSize(26).text('Invoice', { underline: true });
+					PDFdocument.fontSize(14).text('-----------------------');
 
-			let currentOrderPrice = 0;
-			databaseFoundOrder.items.forEach((product) => {
-				PDFdocument.text(`${product.title}  (${product.quantity} x R$ ${product.price})`);
-				currentOrderPrice += +product.price * product.quantity;
+					let currentOrderPrice = 0;
+					databaseFoundOrder.items.forEach((product) => {
+						PDFdocument.text(`${product.title}  (${product.quantity} x R$ ${product.price})`);
+						currentOrderPrice += +product.price * product.quantity;
+					});
+					PDFdocument.text(`Total cost of this order: R$ ${currentOrderPrice}`);
+
+					//? Complete both saving to disk and sending to client
+					PDFdocument.end();
+					return;
+				}
+
+				// ? Read the file in chunks of stream data and send that
+				// ? piece by piece to the client
+				// ! This is done to avoid loading several files into memory and causing
+				// ! a memory overflow when there are simultaneous requests with big files
+				const file = fs.createReadStream(invoicePath);
+				//? Defines the file as PDF
+				res.setHeader('ContentType', 'application/pdf');
+				//? "attachment" tells the browser to download the file (inline would open in a new tab)
+				//? "filename" defines the name and extension of the file for the user
+				res.setHeader('Content-Disposition', 'attachment; filename="' + invoiceFile + '"');
+				file.pipe(res);
 			});
-			PDFdocument.text(`Total cost of this order: R$ ${currentOrderPrice}`);
 
-			//? Complete both saving to disk and sending to client
-			PDFdocument.end();
 			// //? Loads the file into memory and serves it to the client
 			// fs.readFile(invoicePath, (invoiceReadFileError, loadedData) => {
 			// 	if (invoiceReadFileError) {
 			// 		return next(invoiceReadFileError);
 			// 	}
-			// 	//? Defines the file as PDF
-			// 	res.setHeader('ContentType', 'application/pdf');
-			// 	//? "attachment" tells the browser to download the file (inline would open in a new tab)
-			// 	//? "filename" defines the name and extension of the file for the user
-			// 	res.setHeader('Content-Disposition', 'attachment; filename="' + invoiceFile + '"');
 			// 	res.send(loadedData);
 			// });
-
-			//? Read the file in chunks of stream data and send that
-			//? piece by piece to the client
-			//! This is done to avoid loading several files into memory and causing
-			//! a memory overflow when there are simultaneous requests with big files
-			// const file = fs.createReadStream(invoicePath);
-			// res.send(loadedData);
-			// file.pipe(res);
 		})
 		.catch((databaseOrderError) => next(databaseOrderError));
 };
