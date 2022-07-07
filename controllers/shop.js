@@ -223,10 +223,11 @@ exports.getOrderInvoice = (req, res, next) => {
 					PDFdocument.pipe(fs.createWriteStream(invoicePath));
 					//? Also send the PDF to the client as it's being created
 					PDFdocument.pipe(res);
-
+					//? Add proper text to the PDF
 					PDFdocument.fontSize(26).text('Invoice', { underline: true });
 					PDFdocument.fontSize(14).text('-----------------------');
-
+					//? Loop through the purchased items of this order and list their prices
+					//? and the order total in the PDF
 					let currentOrderPrice = 0;
 					databaseFoundOrder.items.forEach((product) => {
 						PDFdocument.text(`${product.title}  (${product.quantity} x R$ ${product.price})`);
