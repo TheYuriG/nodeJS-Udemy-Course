@@ -6,7 +6,6 @@ const Valid = require('validatorjs');
 
 //? Import file deletion util package
 const { yeet } = require('../util/file-management');
-const { image } = require('pdfkit');
 
 //? Helper function to return the flash content of a request but
 //? will return null if there is no message flashed
@@ -280,26 +279,55 @@ exports.deleteProduct = (req, res, next) => {
 //? Loads the page to view all products in admin mode (with edit) only for
 //? the user currently logged in (userId == 1)
 exports.getProducts = (req, res, next) => {
+	//? Pull data about the number of the page being visited. If the user
+	//? isn't at a specific page yet, consider they are on the first page
+	const page = req.query.page ?? 1;
+	//? Initialize the variable that will store how many items this user
+	//? has created so far
+	let productsCreatedByThisUser;
+
+	//? Defines max number of items per page (for admins) to organize pagination
+	let MAX_ITEMS_ADMIN = 3;
+
+	//? Goes through all items in the database to pull the total number
+	//? of them created by this user and update "productsCreatedByThisUser"
+	//? Then actually load the necessary ones with proper pagination
 	Product.find({ userId: req.session.user._id })
-		//? Mongoose has helper functions that enable you to filter in and out
-		//? some specific data
-		// .select('title price -_id')
-		//? SELECT filters to only return the title and price of the product, while
-		//? forcefully removing the ID which would always be returned otherwise
-		// .populate('userId', 'name')
-		//? Assuming you have declared a relational schema in the model,
-		//? POPULATE will add that very same data to the product object
-		//? that is going to be returned by this method. The first argument
-		//? will point what schema reference will be pulled from another
-		//? database and the second argument will be the name of the property
-		//? that you want to be pulled and added to this retrieved product.
-		//? I would assume the class creator will be using this when
-		//? we readd the orders page
+		.countDocuments()
+		.then((numberOfProducts) => {
+			//? Update "productsCreatedByThisUser"
+			productsCreatedByThisUser = numberOfProducts;
+
+			//? Iterate through the items again, but this time only returning
+			//? the max possible inside a page, considering what page the user
+			//? might be visiting at the moment (if any, else load page 1)
+			return Product.find({ userId: req.session.user._id })
+				.skip((page - 1) * MAX_ITEMS_ADMIN)
+				.limit(MAX_ITEMS);
+			//! Mongoose has helper functions that enable you to filter
+			//! in and out some specific data
+			// .select('title price -_id')
+			//! SELECT filters to only return the title and price of
+			//! the product, while forcefully removing the ID which
+			//! would always be returned otherwise
+			// .populate('userId', 'name')
+			//! Assuming you have declared a relational schema in the model,
+			//! POPULATE will add that very same data to the product object
+			//! that is going to be returned by this method. The first argument
+			//! will point what schema reference will be pulled from another
+			//! database and the second argument will be the name of the property
+			//! that you want to be pulled and added to this retrieved product.
+		})
 		.then((products) => {
+			//? Load the page with the items within the specified range of
+			//? page * MAX_ITEMS_ADMIN
 			res.render('admin/products', {
 				prods: products,
 				pageTitle: 'Admin Products',
 				path: '/admin/products',
+				maxItems: productsCreatedByThisUser,
+				itemLimitPerPage: MAX_ITEMS_ADMIN,
+				page: page,
 			});
 		})
 		.catch((err) => {

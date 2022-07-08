@@ -10,13 +10,42 @@ const Product = require('../models/product');
 const Order = require('../models/order');
 const User = require('../models/user');
 
+//? Defines max number of items per page (for clients) to organize pagination
+const MAX_ITEMS_CLIENT = 3;
+
 exports.getProducts = (req, res, next) => {
+	//? Pull data about the number of the page being visited. If the user
+	//? isn't at a specific page yet, consider they are on the first page
+	const page = req.query?.page ?? 1;
+	//? Initialize the total number of products on the database for later
+	let totalNumberOfProductsOnSlashProducts;
+
+	//? Goes through all items in the database to pull the total number and
+	//? update "totalNumberOfProducts" and then actually load the necessary
+	//? ones with proper pagination
 	Product.find()
+		.countDocuments()
+		.then((numberOfProducts) => {
+			//? Update "totalNumberOfProductsOnSlashProducts"
+			totalNumberOfProductsOnSlashProducts = numberOfProducts;
+
+			//? Iterate through the items again, but this time only returning
+			//? the max possible inside a page, considering what page the user
+			//? might be visiting at the moment (if any, else load page 1)
+			return Product.find()
+				.skip((page - 1) * MAX_ITEMS_CLIENT)
+				.limit(MAX_ITEMS_CLIENT);
+		})
 		.then((products) => {
+			//? Load the page with the items within the specified range of
+			//? page * MAX_ITEMS_CLIENT
 			res.render('shop/product-list', {
 				pageTitle: 'All Products',
 				path: '/products',
 				prods: products,
+				maxItems: totalNumberOfProductsOnSlashProducts,
+				itemLimitPerPage: MAX_ITEMS_CLIENT,
+				page: page,
 			});
 		})
 		.catch((err) => {
@@ -45,12 +74,38 @@ exports.getProductDetail = (req, res, next) => {
 
 //? Loads main page with products with pagination
 exports.getIndex = (req, res, next) => {
+	//? Pull data about the number of the page being visited. If the user
+	//? isn't at a specific page yet, consider they are on the first page
+	const page = req.query?.page ?? 1;
+	//? Initialize the total number of products on the database for later
+	let totalNumberOfProductsOnIndex;
+
+	//? Goes through all items in the database to pull the total number and
+	//? update "totalNumberOfProducts" and then actually load the necessary
+	//? ones with proper pagination
 	Product.find()
+		.countDocuments()
+		.then((numberOfProducts) => {
+			//? Update "totalNumberOfProductsOnIndex"
+			totalNumberOfProductsOnIndex = numberOfProducts;
+
+			//? Iterate through the items again, but this time only returning
+			//? the max possible inside a page, considering what page the user
+			//? might be visiting at the moment (if any, else load page 1)
+			return Product.find()
+				.skip((page - 1) * MAX_ITEMS_CLIENT)
+				.limit(MAX_ITEMS_CLIENT);
+		})
 		.then((products) => {
+			//? Load the page with the items within the specified range of
+			//? page * MAX_ITEMS_CLIENT
 			res.render('shop/index', {
-				prods: products,
 				pageTitle: 'Shop',
 				path: '/',
+				prods: products,
+				maxItems: totalNumberOfProductsOnIndex,
+				itemLimitPerPage: MAX_ITEMS_CLIENT,
+				page: page,
 			});
 		})
 		.catch((err) => {
