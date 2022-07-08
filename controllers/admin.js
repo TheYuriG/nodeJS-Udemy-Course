@@ -303,7 +303,7 @@ exports.getProducts = (req, res, next) => {
 			//? might be visiting at the moment (if any, else load page 1)
 			return Product.find({ userId: req.session.user._id })
 				.skip((page - 1) * MAX_ITEMS_ADMIN)
-				.limit(MAX_ITEMS);
+				.limit(MAX_ITEMS_ADMIN);
 			//! Mongoose has helper functions that enable you to filter
 			//! in and out some specific data
 			// .select('title price -_id')
