@@ -16,7 +16,7 @@ const MAX_ITEMS_CLIENT = 3;
 exports.getProducts = (req, res, next) => {
 	//? Pull data about the number of the page being visited. If the user
 	//? isn't at a specific page yet, consider they are on the first page
-	const page = +req.query?.page ?? 1;
+	const page = +(req.query.page ?? 1);
 	//? Initialize the total number of products on the database for later
 	let totalNumberOfProductsOnSlashProducts;
 
@@ -76,7 +76,7 @@ exports.getProductDetail = (req, res, next) => {
 exports.getIndex = (req, res, next) => {
 	//? Pull data about the number of the page being visited. If the user
 	//? isn't at a specific page yet, consider they are on the first page
-	const page = +req.query?.page ?? 1;
+	const page = +(req.query.page ?? 1);
 	//? Initialize the total number of products on the database for later
 	let totalNumberOfProductsOnIndex;
 

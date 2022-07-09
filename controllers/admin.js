@@ -281,7 +281,7 @@ exports.deleteProduct = (req, res, next) => {
 exports.getProducts = (req, res, next) => {
 	//? Pull data about the number of the page being visited. If the user
 	//? isn't at a specific page yet, consider they are on the first page
-	const page = +req.query.page ?? 1;
+	const page = +(req.query.page ?? 1);
 	//? Initialize the variable that will store how many items this user
 	//? has created so far
 	let productsCreatedByThisUser;
