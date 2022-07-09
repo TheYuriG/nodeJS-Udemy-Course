@@ -1,0 +1,16 @@
+<section class="pagination">
+  <% let maxPage = Math.ceil(maxItems/itemLimitPerPage) %>
+  <% if (page !== 1) { %>
+  <a href="<%= path %>?page=1">1</a>
+  <% } %>
+  <% if (page > 2) { %>
+  <a href="<%= path %>?page=<%= page - 1 %>"><%= page - 1 %></a>
+  <% } %>
+  <a href="<%= path %>?page=<%= page %>" class="active"><%= page %></a>
+  <% if (maxPage - page > 1) { %>
+  <a href="<%= path %>?page=<%= page + 1 %>"><%= page + 1 %></a>
+  <% } %>
+  <% if (maxPage !== page) { %>
+  <a href="<%= path %>?page=<%= maxPage %>"><%= maxPage %></a>
+  <% } %>
+</section>
