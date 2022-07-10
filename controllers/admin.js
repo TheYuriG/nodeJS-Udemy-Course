@@ -248,7 +248,7 @@ exports.postEditProduct = (req, res, next) => {
 
 //? Processes the item deletion request from clicking "Delete" on /admin/products
 exports.deleteProduct = (req, res, next) => {
-	//? Gets the ID of the item to be deleted through the POST request
+	//? Gets the ID of the item to be deleted with "admin_delete.js"
 	const deletionID = req.params.productId;
 
 	//? Looks up the product on the database
@@ -264,10 +264,13 @@ exports.deleteProduct = (req, res, next) => {
 			return Product.deleteOne({ _id: deletionID, userId: req.session.user._id });
 		})
 		.then(() => {
-			//?
+			//? Return a 200 response to the fetch request so the respective
+			//? "article" in the HTML gets deleted
 			res.status(200).json({ message: 'Success!' });
 		})
 		.catch((err) => {
+			//? Return an error 500 response to the fetch request so the
+			//? webpage displays an error message back to the user
 			res.status(500).json({ message: 'Failed to delete product!' });
 		});
 };
