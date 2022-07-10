@@ -39,9 +39,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //? Parses requests where a form will send forms with "multipart/form-data"
 //? encoding type, but will contain a single image
 app.use(multer({ storage: fileDestinationAndNaming, fileFilter: fileTypeFilter }).single('image'));
-//? Enables the css and image folders to be publicly accessed at any point
+//? Enables the js, css and image folders to be publicly accessed at any point
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/javascript', express.static(path.join(__dirname, 'javascript')));
 
 //? Adds the middleware for handling user sessions, set up the proper cookie,
 //? reads it when needed and stores it in MongoDB to avoid a memory overflow

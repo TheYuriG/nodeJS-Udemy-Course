@@ -256,7 +256,7 @@ exports.deleteProduct = (req, res, next) => {
 		.then((product) => {
 			//? If the product doesn't exist, error out this request
 			if (!product) {
-				return next(new Error("Product not found, couldn't delete associated image."));
+				throw Error("Product not found, couldn't delete associated image.");
 			}
 			//? and if it exists, delete its related image before
 			//? removing said product from the database
@@ -264,15 +264,11 @@ exports.deleteProduct = (req, res, next) => {
 			return Product.deleteOne({ _id: deletionID, userId: req.session.user._id });
 		})
 		.then(() => {
-			//? Redirects (reloads) back to the same /admin/products page
-			//? which should now be missing the item you have just
-			//? requested to delete
-			res.redirect('/admin/products');
+			//?
+			res.status(200).json({ message: 'Success!' });
 		})
 		.catch((err) => {
-			const error = new Error(err);
-			error.httpStatusCode = 500;
-			return next(error);
+			res.status(500).json({ message: 'Failed to delete product!' });
 		});
 };
 

@@ -25,7 +25,7 @@ router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 //? Handles the request to editing an item from the database
 router.post('/edit-product', isAuth, adminController.postEditProduct);
 
-//? Handles the item deletion request
-router.post('/delete-product/:productId', isAuth, adminController.deleteProduct);
+//? Handles the item deletion request button on /admin/products
+router.delete('/delete-product/:productId', isAuth, adminController.deleteProduct);
 
 module.exports = router;
