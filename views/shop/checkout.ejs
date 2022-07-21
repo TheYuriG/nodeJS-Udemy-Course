@@ -1,0 +1,29 @@
+<%- include('../includes/head.ejs') %>
+</head>
+
+<body>
+  <%- include('../includes/navigation.ejs') %>
+  <main>
+    <%# for every item inside cart.items, process individual data %>
+    <ul>
+      <% let currentOrderPrice = 0 %>
+      <% cartItems.forEach(item=> { %>
+      <li class="cart__item">
+        <h1>
+          <%= item.productId.title %>
+          <%# since the item data is nested inside productId, we need to access
+      that property before accessing any other nested properties %>
+        </h1>
+        <h2>Quantity:
+          <%= item.quantity %>
+          <% currentOrderPrice += +product.price * product.quantity %>
+          <%# quantity isn't nested, unlike the rest %>
+        </h2>
+      </li>
+      <% }) %>
+    </ul>
+    <div>
+      <h2>Total: R$ <%= currentOrderPrice %> </h2>
+    </div>
+  </main>
+  <%- include('../includes/end.ejs') %>

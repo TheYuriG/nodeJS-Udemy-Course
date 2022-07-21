@@ -174,6 +174,24 @@ exports.postCartDeletion = (req, res, next) => {
 		});
 };
 
+//? Handles the get request when clicking "Order now!" in /cart
+exports.getCheckout = (req, res, next) => {
+	User.findById(req.session.user._id)
+		.then((user) => {
+			user.getCart().then((cartItemsArray) => {
+				res.render('shop/checkout', {
+					path: '/checkout',
+					pageTitle: 'Checkout',
+					cartItems: cartItemsArray.items,
+				});
+			});
+		})
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
+};
 //? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrders = (req, res, next) => {
 	//? Search through all orders and retrieve the ones that
@@ -285,7 +303,9 @@ exports.getOrderInvoice = (req, res, next) => {
 					//? and the order total in the PDF
 					let currentOrderPrice = 0;
 					databaseFoundOrder.items.forEach((product) => {
-						PDFdocument.text(`${product.title}  (${product.quantity} x R$ ${product.price})`);
+						PDFdocument.text(
+							`${product.title}  (${product.quantity} x R$ ${product.price})`
+						);
 						currentOrderPrice += +product.price * product.quantity;
 					});
 					PDFdocument.text(`Total cost of this order: R$ ${currentOrderPrice}`);

@@ -25,6 +25,9 @@ router.post('/cart', isAuth, shopController.postCart);
 //? Handles the deletion POST request from cart so the user can remove items before checkout, if the user is logged in
 router.post('/cart-delete-item', isAuth, shopController.postCartDeletion);
 
+//? Handles the GET request after starting a purchase at "/cart"
+router.get('/checkout', isAuth, shopController.getCheckout);
+
 //? Loads the "/orders" page, if the user is logged in
 router.get('/orders', isAuth, shopController.getOrders);
 

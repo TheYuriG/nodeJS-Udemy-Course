@@ -31,12 +31,13 @@
     </ul>
     <hr>
     <div class="centered">
-      <form action="/order-this-cart" method="POST">
+      <!-- <form action="/order-this-cart" method="POST">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" value="<%= JSON.stringify(cartItems) %>" name="cartToOrder">
         <%# JSON stringify the cart.items data to be used in postOrders. be careful
         that it will be necessary to also access nested properties in that %>
-        <button type="submit" class="btn">Order Now!</button>
+        <button type="submit" class="btn">Order Now!</button> -->
+      <a class="btn" href="/checkout">Order now!</a>
       </form>
     </div>
     <% } else { %>
