@@ -1,9 +1,8 @@
 //? Import core feature from NodeJS to upload invoices
 const fs = require('fs');
 const path = require('path');
-const stripe = require('stripe')(
-	'sk_test_51LORTkCUvkoLIpH9oX7KveM7ITNIBV3b3DrONQqXOF1muAwIJ6Wusu2NrEGSjBFveCJiOMSpl7Gk3DtPoxoEtxkD00i8hPS6Au'
-);
+const { stripeSecret } = require('../util/secrets/keys');
+const stripe = require('stripe')(stripeSecret);
 
 //? Import NPM packages
 const PDFer = require('pdfkit');
