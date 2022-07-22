@@ -1,6 +1,9 @@
 //? Import core feature from NodeJS to upload invoices
 const fs = require('fs');
 const path = require('path');
+const stripe = require('stripe')(
+	'sk_test_51LORTkCUvkoLIpH9oX7KveM7ITNIBV3b3DrONQqXOF1muAwIJ6Wusu2NrEGSjBFveCJiOMSpl7Gk3DtPoxoEtxkD00i8hPS6Au'
+);
 
 //? Import NPM packages
 const PDFer = require('pdfkit');
@@ -176,14 +179,40 @@ exports.postCartDeletion = (req, res, next) => {
 
 //? Handles the get request when clicking "Order now!" in /cart
 exports.getCheckout = (req, res, next) => {
+	//? Cart variable to store this user's cart and then use after
+	//? the stripe session was created
+	let tempCart;
+
+	//? Looks up the user making this request
 	User.findById(req.session.user._id)
 		.then((user) => {
-			user.getCart().then((cartItemsArray) => {
-				res.render('shop/checkout', {
-					path: '/checkout',
-					pageTitle: 'Checkout',
-					cartItems: cartItemsArray.items,
-				});
+			//? Get this user's cart
+			return user.getCart();
+		})
+		.then((cartItemsArray) => {
+			//? Soft store the cart on the variable
+			tempCart = cartItemsArray;
+			return stripe.checkout.sessions.create({
+				payment_method_types: ['card'],
+				line_items: cartItemsArray.items.map((p) => {
+					return {
+						name: p.productId.title,
+						description: p.productId.description,
+						amount: p.productId.price * 100,
+						currency: 'usd',
+						quantity: p.quantity,
+					};
+				}),
+				success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+				cancel_url: req.protocol + '://' + req.get('host') + '/cart',
+			});
+		})
+		.then((session) => {
+			res.render('shop/checkout', {
+				path: '/checkout',
+				pageTitle: 'Checkout',
+				cartItems: tempCart.items,
+				sessionId: session,
 			});
 		})
 		.catch((err) => {
@@ -192,6 +221,7 @@ exports.getCheckout = (req, res, next) => {
 			return next(error);
 		});
 };
+
 //? Pulls the Order data and then pass it into the view to be rendered properly
 exports.getOrders = (req, res, next) => {
 	//? Search through all orders and retrieve the ones that

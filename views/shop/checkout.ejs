@@ -1,4 +1,5 @@
 <%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/cart.css">
 </head>
 
 <body>
@@ -16,14 +17,27 @@
         </h1>
         <h2>Quantity:
           <%= item.quantity %>
-          <% currentOrderPrice += +product.price * product.quantity %>
+          <% currentOrderPrice += +item.productId.price * item.quantity %>
           <%# quantity isn't nested, unlike the rest %>
         </h2>
       </li>
       <% }) %>
     </ul>
-    <div>
+    <div class="centered">
       <h2>Total: R$ <%= currentOrderPrice %> </h2>
+    </div>
+    <div class="centered">
+      <button id="order-button" class="btn">Order</button>
+      <script src="https://js.stripe.com/v3/"></script>
+      <script>
+        var stripe = Stripe('pk_test_51LORTkCUvkoLIpH9KHsDTIR4DFbYRLvQZhvk1qAICCvnJSL69TvW10xZgv6tvN6CBhZIyc48Fx6sj26nHPKBJovH00y8LapE64');
+        var orderButton = document.getElementById('order-button')
+        orderButton.addEventListener('click', function() {
+          stripe.redirectToCheckout({
+            sessionId: sessionId
+          })
+        })
+      </script>
     </div>
   </main>
   <%- include('../includes/end.ejs') %>
