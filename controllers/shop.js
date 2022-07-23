@@ -1,11 +1,13 @@
 //? Import core feature from NodeJS to upload invoices
 const fs = require('fs');
 const path = require('path');
+
+//? Pull the stripe secret key from util
 const { stripeSecret } = require('../util/secrets/keys');
-const stripe = require('stripe')(stripeSecret);
 
 //? Import NPM packages
 const PDFer = require('pdfkit');
+const stripe = require('stripe')(stripeSecret);
 
 //? Imports the data models
 const Product = require('../models/product');
@@ -205,11 +207,16 @@ exports.getCheckout = (req, res, next) => {
 			return user.getCart();
 		})
 		.then((cartItemsArray) => {
-			//? Soft store the cart on the variable
+			//? Soft store the cart on the variable so we can use the cart
+			//? after the session was created and successfully returned
 			tempCart = cartItemsArray;
+
+			//? Create a stripe session for this user
 			return stripe.checkout.sessions.create({
-				payment_method_types: ['card'],
+				//? Pass in all the necessary information to stripe
+				payment_method_types: ['card'], //? Payment type
 				line_items: cartItemsArray.items.map((p) => {
+					//? Array of items to be purchased
 					return {
 						name: p.productId.title,
 						description: p.productId.description,
@@ -218,17 +225,73 @@ exports.getCheckout = (req, res, next) => {
 						quantity: p.quantity,
 					};
 				}),
-				success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
-				cancel_url: req.protocol + '://' + req.get('host') + '/cart',
+				//? Where to redirect if the purchase is successful
+				success_url: req.protocol + '://' + req.get('host') + '/checkout/stripe',
+
+				//? Where to redirect if the user doesn't complete the purchase
+				cancel_url: req.protocol + '://' + req.get('host') + '/checkout',
 			});
 		})
 		.then((session) => {
+			//? With the session render the page using the variable that
+			//? soft stored the cart
 			res.render('shop/checkout', {
 				path: '/checkout',
 				pageTitle: 'Checkout',
 				cartItems: tempCart.items,
-				sessionId: session,
+				sessionId: session.id,
 			});
+		})
+		.catch((err) => {
+			const error = new Error(err);
+			error.httpStatusCode = 500;
+			return next(error);
+		});
+};
+
+//? Success of a stripe payment after "/checkout" redirects to the Stripe website
+//! This URL can be manually accessed which would trigger a purchase completion
+//! We should manually check purchases by using webhooks, but those doesn't
+//! work in localhost since our page isn't exposed to outsiders
+//! Consider this in production
+exports.stripeSuccess = (req, res, next) => {
+	//? Look up the user making the request to "/checkout/stripe"
+	User.findById(req.session.user._id)
+		.then((user) => {
+			//? Once you find the user, fetch their cart
+			return user.getCart();
+		})
+		.then((parsedOrder) => {
+			//? Fix the data from the cart in order to be able to save it
+			//? in the orders database, else the validator will fail
+			parsedOrder = parsedOrder.items.map((orderItem) => {
+				let itemObject = {};
+				itemObject.productId = orderItem.productId._id;
+				itemObject.title = orderItem.productId.title;
+				itemObject.imagePath = orderItem.productId.imagePath;
+				itemObject.price = orderItem.productId.price;
+				itemObject.description = orderItem.productId.description;
+				itemObject.quantity = orderItem.quantity;
+				return itemObject;
+			});
+
+			//? Pass the parsedOrder into the Order model to save the order related
+			//? to this cart, since the current price being paid is important in case
+			//? the cost of this item is changed in the database in the future.
+			const order = new Order({ userId: req.session.user._id, items: parsedOrder.items });
+			return order.save();
+		})
+		.then(() => User.findById(req.session.user._id))
+		.then((user) => {
+			//? Empty the user's cart after completing an order
+			req.session.user = user;
+			req.session.user.cart.items = [];
+			return req.session.user.save();
+		})
+		.then(() => {
+			//? Once you finish processing and storing this current order,
+			//? redirect the user to the orders page and display the orders
+			res.redirect('/orders');
 		})
 		.catch((err) => {
 			const error = new Error(err);
@@ -249,53 +312,6 @@ exports.getOrders = (req, res, next) => {
 				pageTitle: 'Your Orders',
 				orders: orderino == null ? [] : orderino, //? Gives back an empty array if no orders were found
 			});
-		})
-		.catch((err) => {
-			const error = new Error(err);
-			error.httpStatusCode = 500;
-			return next(error);
-		});
-};
-
-//? Handles the POST request when proceeding to checkout from cart
-exports.postOrders = (req, res, next) => {
-	//? Process the order once Stripe returns a success after
-	//? clicking "Order now!" at /checkout
-	let parsedOrder = JSON.parse(req.body.cartToOrder);
-
-	//? Fix the data from the JSON in order to be able to save it
-	//? in the orders database, else the validator will fail
-	parsedOrder = parsedOrder.map((orderItem) => {
-		let itemObject = {};
-		itemObject.productId = orderItem.productId._id;
-		itemObject.title = orderItem.productId.title;
-		itemObject.imagePath = orderItem.productId.imagePath;
-		itemObject.price = orderItem.productId.price;
-		itemObject.description = orderItem.productId.description;
-		itemObject.quantity = orderItem.quantity;
-		return itemObject;
-	});
-
-	//? Pass the parsedOrder into the User model to save the order related
-	//? to this cart, since the current price being paid is important in case
-	//? the cost of this item is changed in the database in the future.
-	//? This is how a real-world application would behave, since the price
-	//? of the item can change, but won't affect how much you actually paid
-	//? for it at the moment you completed your transaction.
-	const order = new Order({ userId: req.session.user._id, items: parsedOrder });
-	order
-		.save()
-		.then(() =>
-			User.findById(req.session.user._id).then((user) => {
-				req.session.user = user;
-				req.session.user.cart.items = [];
-				req.session.user.save();
-			})
-		)
-		.then((success) => {
-			//? Once you finish processing and storing this current order,
-			//? redirect the user to the orders page and display the orders
-			res.redirect('/orders');
 		})
 		.catch((err) => {
 			const error = new Error(err);
@@ -384,12 +400,3 @@ exports.getOrderInvoice = (req, res, next) => {
 		})
 		.catch((databaseOrderError) => next(databaseOrderError));
 };
-
-// exports.getCheckout = (req, res, next) => {
-// 	const loginData = req.session.isAuthenticated ? true : false;
-// 	res.render('shop/checkout', {
-// 		path: '/checkout',
-// 		pageTitle: 'Checkout',
-// 		isAuthenticated: loginData,
-// 	});
-// };

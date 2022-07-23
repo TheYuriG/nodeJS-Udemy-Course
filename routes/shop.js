@@ -28,12 +28,11 @@ router.post('/cart-delete-item', isAuth, shopController.postCartDeletion);
 //? Handles the GET request after starting a purchase at "/cart"
 router.get('/checkout', isAuth, shopController.getCheckout);
 
+//? Processes a successful Stripe payment after being redirected at "/checkout"
+router.get('/checkout/stripe', isAuth, shopController.stripeSuccess);
+
 //? Loads the "/orders" page, if the user is logged in
 router.get('/orders', isAuth, shopController.getOrders);
-
-//? Handles the POST request to "/order-this-cart" when clicking
-//? the "Order Now!" button in "/cart"
-router.post('/order-this-cart', isAuth, shopController.postOrders);
 
 //? Displays an invoice for a specific order in pdf format
 router.get('/invoice/:invoiceId', isAuth, shopController.getOrderInvoice);

@@ -27,14 +27,14 @@
       <h2>Total: R$ <%= currentOrderPrice %> </h2>
     </div>
     <div class="centered">
-      <button id="order-button" class="btn">Order</button>
+      <button id="order-button" class="btn">Order now!</button>
       <script src="https://js.stripe.com/v3/"></script>
       <script>
         var stripe = Stripe('pk_test_51LORTkCUvkoLIpH9KHsDTIR4DFbYRLvQZhvk1qAICCvnJSL69TvW10xZgv6tvN6CBhZIyc48Fx6sj26nHPKBJovH00y8LapE64');
         var orderButton = document.getElementById('order-button')
         orderButton.addEventListener('click', function() {
           stripe.redirectToCheckout({
-            sessionId: sessionId
+            sessionId: '<%= sessionId %>'
           })
         })
       </script>
