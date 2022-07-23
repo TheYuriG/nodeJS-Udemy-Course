@@ -15,6 +15,7 @@ const User = require('../models/user');
 //? Defines max number of items per page (for clients) to organize pagination
 const MAX_ITEMS_CLIENT = 3;
 
+//? Loads all products at "/products"
 exports.getProducts = (req, res, next) => {
 	//? Pull data about the number of the page being visited. If the user
 	//? isn't at a specific page yet, consider they are on the first page
@@ -59,8 +60,12 @@ exports.getProducts = (req, res, next) => {
 
 //? Controller for individual item details
 exports.getProductDetail = (req, res, next) => {
+	//? Using the ID provided after "/product" through "/:productId"
+	//? look up the database for this product
 	Product.findById(req.params.productId)
 		.then((product) => {
+			//? Using all of the product data, return a page that will
+			//? display all the information to the user
 			res.render('shop/product-detail', {
 				product: product,
 				pageTitle: product.title,
@@ -119,19 +124,22 @@ exports.getIndex = (req, res, next) => {
 
 //? Method to pull all cart items and then use their data
 exports.getCart = (req, res, next) => {
+	//? Look up the user making the request to "/cart"
 	User.findById(req.session.user._id)
 		.then((user) => {
-			user.getCart().then((cartItemsArray) => {
-				//? Then render the cart page with whatever content
-				//? there is in the cart or just an empty cart
-				//! Since the productId gets nested-populated by the .populate()
-				//! method in mongoose, we need to travel inside of that when
-				//! calling the res.render()
-				res.render('shop/cart', {
-					path: '/cart',
-					pageTitle: 'Your Cart',
-					cartItems: cartItemsArray.items,
-				});
+			//? Once you find the user, fetch their cart
+			return user.getCart();
+		})
+		.then((cartItemsArray) => {
+			//? Then render the cart page with whatever content
+			//? there is in the cart or just an empty cart
+			//! Since the productId gets nested-populated by the .populate()
+			//! method in mongoose, we need to travel inside of that when
+			//! calling the res.render()
+			res.render('shop/cart', {
+				path: '/cart',
+				pageTitle: 'Your Cart',
+				cartItems: cartItemsArray.items,
 			});
 		})
 		.catch((err) => {
@@ -143,12 +151,18 @@ exports.getCart = (req, res, next) => {
 
 //? Handles the POST request when clicking any "Add to Cart" buttons
 exports.postCart = (req, res, next) => {
+	//? Store the ID of the product being added to the cart
 	const productoId = req.body.producto;
+
+	//? Look up this item in the database through the ID
 	Product.findById(productoId)
 		.then((product) => {
+			//? With the item, look up the user data to get this item
+			//? added to their cart
 			return User.findById(req.session.user._id).then((user) => user.addToCart(product));
 		})
 		.then(() => {
+			//? Once successfully adding this item to the user cart, redirect
 			res.redirect('/cart');
 		})
 		.catch((err) => {
@@ -162,11 +176,13 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeletion = (req, res, next) => {
 	//? Fetches the product id that is meant to be deleted
 	const productoId = req.body.idOfItemToBeDeleted;
-	//? After the cartItem product instance, redirect the user to the cart
-	//? page and display any remaining items in it, if any
+
+	//? Look up the user requesting the item cart deletion
 	User.findById(req.session.user._id)
+		//? Request to delete the item with "productoID" from the cart
 		.then((user) => user.removeFromCart(productoId))
 		.then(() => {
+			//? Once successful, redirect again to "/cart"
 			res.redirect('/cart');
 		})
 		.catch((err) => {
@@ -243,7 +259,8 @@ exports.getOrders = (req, res, next) => {
 
 //? Handles the POST request when proceeding to checkout from cart
 exports.postOrders = (req, res, next) => {
-	//? Parse the order object passed as JSON upon clicking "Order now!" at /cart
+	//? Process the order once Stripe returns a success after
+	//? clicking "Order now!" at /checkout
 	let parsedOrder = JSON.parse(req.body.cartToOrder);
 
 	//? Fix the data from the JSON in order to be able to save it
