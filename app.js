@@ -10,6 +10,7 @@ const MongoSessionStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flashData = require('connect-flash');
 const multer = require('multer');
+const helmet = require('helmet');
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -33,6 +34,9 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authenticationRoutes = require('./routes/auth');
+
+//? Push all requests through helmet for SSL protection and preventing fraud
+app.use(helmet());
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
