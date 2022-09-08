@@ -21,18 +21,10 @@ function flashMessage(flash) {
 	return null;
 }
 
-//? Keys will be added to a file listed in .gitignore so they don't get
-//? uploaded to GitHub when done. This allows this repository to go public
-//? without worrying about having the test accounts (MongoDB + Compass, SendGrid)
-//? used maliciously by others
-//TODO Add a readme.md that outlines the need to setup a MongoDB and
-//TODO SendGrid accounts so people can actually test features if they clone this
-const { sendGridAPIKey, senderEmail } = require('../util/secrets/keys');
-
 const transporter = mailer.createTransport(
 	senderGrid({
 		auth: {
-			api_key: sendGridAPIKey,
+			api_key: process.env.SENDGRID_KEY,
 		},
 	})
 );
@@ -77,10 +69,16 @@ exports.postLogin = (req, res) => {
 
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
-	const passwordValidation = new Valid({ password: postLoginPassword }, { password: 'required|string|min:8' });
+	const passwordValidation = new Valid(
+		{ password: postLoginPassword },
+		{ password: 'required|string|min:8' }
+	);
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message
-		req.flash('authenticatePassword', 'Your passwords are required to be at least 8 characters long.');
+		req.flash(
+			'authenticatePassword',
+			'Your passwords are required to be at least 8 characters long.'
+		);
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
@@ -116,7 +114,10 @@ exports.postLogin = (req, res) => {
 			})
 			.catch((e) => {
 				console.log(e);
-				req.flash('authenticateEmail', 'An undefined error happened, please contact the system administrator!');
+				req.flash(
+					'authenticateEmail',
+					'An undefined error happened, please contact the system administrator!'
+				);
 				return rerender();
 			});
 	});
@@ -167,7 +168,7 @@ exports.postPasswordReset = (req, res) => {
 				.then((savedUser) => {
 					return transporter.sendMail({
 						to: postLoginEmail, //? email of the created account
-						from: senderEmail, //? email validated in SendGrid
+						from: process.env.SENDGRID_EMAIL, //? email validated in SendGrid
 						subject: `Password reset request`,
 						html: `
 				<p>A password reset was requested for this email address.</p>
@@ -177,7 +178,10 @@ exports.postPasswordReset = (req, res) => {
 					});
 				})
 				.then(() => {
-					req.flash('success', 'Your reset email was sent, please check your inbox/spam folder!');
+					req.flash(
+						'success',
+						'Your reset email was sent, please check your inbox/spam folder!'
+					);
 					res.redirect('/forgot-password');
 				})
 				.catch((e) => {
@@ -237,10 +241,16 @@ exports.postResettingPasswordNow = (req, res) => {
 
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
-	const passwordValidation = new Valid({ password: password1 }, { password: 'required|string|min:8' });
+	const passwordValidation = new Valid(
+		{ password: password1 },
+		{ password: 'required|string|min:8' }
+	);
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message and reload the page
-		req.flash('invalidPassword', 'Your passwords are required to be at least 8 characters long.');
+		req.flash(
+			'invalidPassword',
+			'Your passwords are required to be at least 8 characters long.'
+		);
 		return res.redirect('/password-reset/' + resetToken);
 	}
 
@@ -324,7 +334,12 @@ exports.postSignUp = (req, res) => {
 			registerErrorName: flashMessage(req.flash('registerName')), //? Adds error message, if any
 			registerErrorPassword: flashMessage(req.flash('registerPassword')), //? Adds error message, if any
 			success: flashMessage(req.flash('success')), //? Adds success message, if any
-			data: { name: name, email: email, password: password, passwordConfirmation: passwordConfirmation }, //? passes back the data that the user tried to input, but ended up failing
+			data: {
+				name: name,
+				email: email,
+				password: password,
+				passwordConfirmation: passwordConfirmation,
+			}, //? passes back the data that the user tried to input, but ended up failing
 		});
 	}
 
@@ -346,10 +361,16 @@ exports.postSignUp = (req, res) => {
 	}
 	//? Creates a validation class and checks for password length and
 	//? returns a failure as true if smaller than 8 chars
-	const passwordValidation = new Valid({ password: password }, { password: 'required|string|min:8' });
+	const passwordValidation = new Valid(
+		{ password: password },
+		{ password: 'required|string|min:8' }
+	);
 	if (passwordValidation.fails()) {
 		//? Properly creates the error message
-		req.flash('registerPassword', 'Your passwords are required to be at least 8 characters long.');
+		req.flash(
+			'registerPassword',
+			'Your passwords are required to be at least 8 characters long.'
+		);
 		//? Increase the error counter to reload the page after all checks
 		errorNum++;
 	}
@@ -377,7 +398,12 @@ exports.postSignUp = (req, res) => {
 			return bcrypt
 				.hash(password, 12)
 				.then((hashPassword) => {
-					const user = new User({ name: name, email: email, password: hashPassword, cart: { items: [] } });
+					const user = new User({
+						name: name,
+						email: email,
+						password: hashPassword,
+						cart: { items: [] },
+					});
 					return user.save();
 				})
 				.then(() => {
@@ -388,7 +414,7 @@ exports.postSignUp = (req, res) => {
 					return transporter
 						.sendMail({
 							to: email, //? email of the created account
-							from: senderEmail, //? email validated in SendGrid
+							from: process.env.SENDGRID_EMAIL, //? email validated in SendGrid
 							subject: `Hello, ${name}! Your account has been created at Shop!`,
 							html: '<h1>Congratulations</h1><p>You can now spend billions on our store</p>',
 						})
@@ -397,7 +423,10 @@ exports.postSignUp = (req, res) => {
 		})
 		.catch((e) => {
 			console.error(e);
-			req.flash('registerEmail', 'An undefined error happened, please contact the system administrator!');
+			req.flash(
+				'registerEmail',
+				'An undefined error happened, please contact the system administrator!'
+			);
 			res.redirect('/register');
 		});
 };

@@ -13,16 +13,16 @@ const multer = require('multer');
 
 //? Project imports
 const errorController = require('./controllers/error');
-//? The key was voided and recreated and is now stored secretly in this
-//? folder that doesn't get synced to GitHub
-const { mongoDBAPIKey, saltSecret } = require('./util/secrets/keys');
 //? Configuration utilities for multer
 const { fileDestinationAndNaming, fileTypeFilter } = require('./util/multer-file-config');
 
 //? Starts express
 const app = express();
 //? Initializes the user session storage
-const sessionStore = new MongoSessionStore({ uri: mongoDBAPIKey, collection: 'sessions' });
+const sessionStore = new MongoSessionStore({
+	uri: process.env.MONGO_SECRET,
+	collection: 'sessions',
+});
 const csrfProtection = csrf();
 
 //? Sets up EJS as the view engine and explicitly define the views folder
@@ -49,7 +49,7 @@ app.use('/javascript', express.static(path.join(__dirname, 'javascript')));
 //? that would happen if all sessions were allocated in memory
 app.use(
 	session({
-		secret: saltSecret,
+		secret: process.env.SALT_SECRET,
 		//? "secret" will define your security. The longer this is, the harder it will be to decrypt your session hash
 		resave: false, //? Set the session to not save again unless data was changed
 		saveUninitialized: false, //? Similar to resave, improves performance
@@ -79,7 +79,6 @@ app.use(authenticationRoutes);
 //? Handles server errors in general
 app.get('/500', errorController.get500);
 app.use((error, req, res, next) => {
-	// res.status(error.httpStatusCode).render(...)
 	console.log(error);
 	res.redirect('/500');
 });
@@ -88,11 +87,13 @@ app.use(errorController.get404);
 
 //? Initiates mongoose
 mongoose
-	.connect(mongoDBAPIKey)
+	.connect(process.env.MONGO_SECRET)
 	.then(() => {
 		//? Sets up which port this website will be displayed to on localhost
 		//? if the database fully connects as it should
-		app.listen(3000, () => {
+		app.listen(process.env.PORT || 3000, () => {
+			//? On production, most hosting services will have the PORT
+			//? environment variable already set up for you
 			console.log('Server listening on port 3000');
 		});
 	})

@@ -2,12 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 
-//? Pull the stripe secret key from util
-const { stripeSecret } = require('../util/secrets/keys');
-
 //? Import NPM packages
 const PDFer = require('pdfkit');
-const stripe = require('stripe')(stripeSecret);
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 //? Imports the data models
 const Product = require('../models/product');

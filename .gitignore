@@ -3,3 +3,4 @@ util/secrets
 .vscode/settings.json
 images
 invoices
+nodemon.json
