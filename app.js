@@ -11,6 +11,7 @@ const csrf = require('csurf');
 const flashData = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
+const compression = require('compression');
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -35,8 +36,10 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authenticationRoutes = require('./routes/auth');
 
-//? Push all requests through helmet for SSL protection and preventing fraud
+//? Push all requests through helmet to prevent possible fraud
 app.use(helmet());
+//? Force all responses to be compressed to improve network performance
+app.use(compression());
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
