@@ -1,5 +1,6 @@
 //? Default imports
 const path = require('path');
+const fs = require('fs');
 
 //? NPM imports
 const express = require('express');
@@ -12,6 +13,7 @@ const flashData = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
+const morgan = require('morgan');
 
 //? Project imports
 const errorController = require('./controllers/error');
@@ -40,6 +42,11 @@ const authenticationRoutes = require('./routes/auth');
 app.use(helmet());
 //? Force all responses to be compressed to improve network performance
 app.use(compression());
+
+//? Build write stream file so that Morgan can log every access
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+//? Use Morgan as middleware to log all connection for later access
+app.use(morgan('combined', { stream: accessLogStream }));
 
 //? Automatically parses body messages, so other commands can use req.body
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -101,7 +108,7 @@ mongoose
 		app.listen(process.env.PORT || 3000, () => {
 			//? On production, most hosting services will have the PORT
 			//? environment variable already set up for you
-			console.log('Server listening on port 3000');
+			console.log('Server listening on port ' + (process.env.PORT || 3000));
 		});
 	})
 	.catch((err) => {
