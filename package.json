@@ -1,13 +1,11 @@
 {
-  "name": "nodejs-complete-guide",
+	"name": "online-shop",
   "version": "1.0.0",
-  "description": "Complete Node.js Guide",
+	"description": "Complete Online Shop",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "start-server": "node app.js"
-  },
+		"start": "node app.js",
   "author": "Maximilian Schwarzmüller",
   "license": "ISC",
   "devDependencies": {
